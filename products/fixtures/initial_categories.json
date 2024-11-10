@@ -1,0 +1,50 @@
+[
+    {
+        "model": "products.productcategory",
+        "pk": 1,
+        "fields": {
+            "name": "Signature Boxes",
+            "slug": "signature-boxes",
+            "description": "Signature Boxes",
+            "active": true,
+            "created": "2024-01-01T00:00:00Z",
+            "updated": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "products.productcategory",
+        "pk": 2,
+        "fields": {
+            "name": "Snacks",
+            "slug": "snacks",
+            "description": "Signature Snacks",
+            "active": true,
+            "created": "2024-01-01T00:00:00Z",
+            "updated": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "products.productcategory",
+        "pk": 3,
+        "fields": {
+            "name": "Signature Bars",
+            "slug": "signature-bars",
+            "description": "Signature Bars",
+            "active": true,
+            "created": "2024-01-01T00:00:00Z",
+            "updated": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "products.productcategory",
+        "pk": 4,
+        "fields": {
+            "name": "Advent Calendars",
+            "slug": "advent-calendars",
+            "description": "Advent Calendars",
+            "active": true,
+            "created": "2024-01-01T00:00:00Z",
+            "updated": "2024-01-01T00:00:00Z"
+        }
+    }
+]

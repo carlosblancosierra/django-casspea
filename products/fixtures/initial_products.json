@@ -1,0 +1,90 @@
+[
+    {
+        "model": "products.product",
+        "pk": 1,
+        "fields": {
+            "name": "Signature Box of 48 Hand Made Chocolates",
+            "description": "Our largest selection box, offering a luxurious array of 48 bonbons with a wide range of flavours for the ultimate indulgence.",
+            "category": 1,
+            "base_price": 74.99,
+            "stripe_price_id": "price_48_box",
+            "slug": "48-bonbons",
+            "weight": 720,
+            "active": true,
+            "units_per_box": 48,
+            "sold_out": false,
+            "main_color": "blue",
+            "secondary_color": "brown",
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "seo_title": "48 Piece Signature Chocolate Box",
+            "seo_description": "Indulge in 48 hand-crafted bonbons with a delightful selection of flavours. Perfect for gifting or personal indulgence."
+        }
+    },
+    {
+        "model": "products.product",
+        "pk": 2,
+        "fields": {
+            "name": "Signature Box of 24 Hand Made Chocolates",
+            "description": "A carefully curated box of 24 bonbons to enjoy or gift. Experience a range of unique and luxurious flavours.",
+            "category": 1,
+            "base_price": 39.99,
+            "stripe_price_id": "price_24_box",
+            "slug": "24-bonbons",
+            "weight": 360,
+            "active": true,
+            "units_per_box": 24,
+            "sold_out": false,
+            "main_color": "orange",
+            "secondary_color": "purple",
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "seo_title": "24 Piece Signature Chocolate Box",
+            "seo_description": "Indulge in a premium selection of 24 hand-crafted chocolates, each with its own distinct flavour. Ideal for gifting or a personal treat."
+        }
+    },
+    {
+        "model": "products.product",
+        "pk": 3,
+        "fields": {
+            "name": "Signature Box of 15 Hand Made Chocolates",
+            "description": "Our bestselling box with 15 chocolates, perfect to sample a variety of our unique flavours.",
+            "category": 1,
+            "base_price": 24.99,
+            "stripe_price_id": "price_15_box",
+            "slug": "15-bonbons",
+            "weight": 225,
+            "active": true,
+            "units_per_box": 15,
+            "sold_out": false,
+            "main_color": "green",
+            "secondary_color": "light-blue",
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "seo_title": "15 Piece Signature Chocolate Box",
+            "seo_description": "Sample a delightful selection of 15 hand-crafted chocolates, perfect for a taste of indulgence or a thoughtful gift."
+        }
+    },
+    {
+        "model": "products.product",
+        "pk": 4,
+        "fields": {
+            "name": "Signature Box of 9 Hand Made Chocolates",
+            "description": "A smaller box with 9 bonbons, carefully selected for a delicious experience.",
+            "category": 1,
+            "base_price": 14.99,
+            "stripe_price_id": "price_9_box",
+            "slug": "9-bonbons",
+            "weight": 135,
+            "active": true,
+            "units_per_box": 9,
+            "sold_out": false,
+            "main_color": "yellow",
+            "secondary_color": "pink",
+            "created_at": "2024-01-01T00:00:00Z",
+            "updated_at": "2024-01-01T00:00:00Z",
+            "seo_title": "9 Piece Signature Chocolate Box",
+            "seo_description": "Enjoy a compact yet luxurious selection of 9 hand-made chocolates, perfect for gifting or a personal treat."
+        }
+    }
+]
