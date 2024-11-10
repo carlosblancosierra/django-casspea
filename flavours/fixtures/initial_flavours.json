@@ -1,0 +1,353 @@
+[
+    {
+        "model": "flavours.flavour",
+        "pk": 1,
+        "fields": {
+            "name": "Apple Pie",
+            "slug": "apple-pie",
+            "description": "Delight on this delicious and classic flavour, with notes of cinnamon, a creamy ganache and a crunchy base.",
+            "mini_description": "With notes of cinnamon, a creamy ganache and a crunchy base.",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/32/Untitled_design.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:52.893741Z",
+            "updated": "2024-09-24T21:47:59.627760Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 2,
+        "fields": {
+            "name": "Baileys and Coffee",
+            "slug": "coffee-with-baileys",
+            "description": "For our coffee lovers we have this amazing blend of roasted coffee with Baileys.",
+            "mini_description": "Roasted coffee with Baileys",
+            "allergens": [
+                1,
+                3,
+                5
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/4/Baileys_and_Coffee.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:04:06.670046Z",
+            "updated": "2024-07-09T20:19:22.769462Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 3,
+        "fields": {
+            "name": "Banana Caramel",
+            "slug": "banana-caramel",
+            "description": "A dark banana caramel blended with both milk and dark chocolate. It is a perfect flavour for those Banoffee lovers.",
+            "mini_description": "Dark banana caramel with milk and dark chocolate",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/2/Banana_Caramel.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:03:52.381920Z",
+            "updated": "2023-07-03T10:16:16.710180Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 4,
+        "fields": {
+            "name": "Blackcurrant Cheesecake",
+            "slug": "blackcurrant-cheesecake",
+            "description": "A classic dessert that fits in the palm of your hand. Tangy and creamy, a perfect combination",
+            "mini_description": "Tangy and creamy, a perfect combination",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/27/2.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:26:45.589072Z",
+            "updated": "2024-09-24T21:48:10.569230Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 5,
+        "fields": {
+            "name": "Brownie",
+            "slug": "brownie",
+            "description": "A milk chocolate ganache with an amazing brownie filling!",
+            "mini_description": "Milk chocolate ganache with brownie filling",
+            "allergens": [
+                1,
+                2
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/16/Nameless_chocolate2.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2023-03-08T23:05:36.649308Z",
+            "updated": "2024-02-22T17:24:02.554405Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 6,
+        "fields": {
+            "name": "Cookie Dough",
+            "slug": "cookie-dough-gf",
+            "description": "This irresistible cooking snack is now gluten free. I'd wager you couldn't eat just one. Do you accept my challenge?",
+            "mini_description": "An irresistible gluten free delight",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/5/Cookie_Dough.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:04:12.833372Z",
+            "updated": "2023-07-03T10:16:59.043945Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 7,
+        "fields": {
+            "name": "Crunchy Peanut",
+            "slug": "crunchy-peanut",
+            "description": "A truly amazing flavour that brings the sweetness of a praline, with a touch of salt. Accompanied by our iconic milk chocolate ganache to balance it out.",
+            "mini_description": "The sweetness of a praline, with a touch of salt.",
+            "allergens": [
+                1,
+                3,
+                4,
+                6
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/26/Crunchy_peanut.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-01-19T13:09:58.632940Z",
+            "updated": "2024-01-30T18:54:49.749627Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 8,
+        "fields": {
+            "name": "Horchata",
+            "slug": "horchata",
+            "description": "Inspired by a traditional Mexican drink that is made up of cinnamon, rice and milk.",
+            "mini_description": "Inspired by a traditional Mexican drink made up of cinnamon, rice, and milk",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/28/6.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:14.134956Z",
+            "updated": "2024-09-24T21:52:12.209398Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 9,
+        "fields": {
+            "name": "Key Lime Pie",
+            "slug": "key-lime-pie",
+            "description": "Truly my favourite flavour. An amazing balance between sweet and sour with a thin cookie at the bottom to bring it all together.",
+            "mini_description": "Sweet and sour with a think cookie base",
+            "allergens": [
+                1,
+                2,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/7/Untitled_design_2.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:04:22.904197Z",
+            "updated": "2024-09-09T16:08:02.462016Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 10,
+        "fields": {
+            "name": "Mango and Passionfruit Caramel",
+            "slug": "mango-and-passionfruit-caramel",
+            "description": "The perfect caramel with the perfect consistency. We got it just right.",
+            "mini_description": "The perfect caramel with the perfect consistency. We got it just right.",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/30/3.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:39.615263Z",
+            "updated": "2024-09-24T21:49:24.021333Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 11,
+        "fields": {
+            "name": "Maple Crunch",
+            "slug": "maple-crunch",
+            "description": "A decadent and delicious flavour that bring maple and lotus biscuits together.",
+            "mini_description": "A decadent and delicious flavour that bring maple and lotus biscuits together.",
+            "allergens": [
+                1,
+                2,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/31/1.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:46.213053Z",
+            "updated": "2024-09-24T21:49:40.585328Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 12,
+        "fields": {
+            "name": "Milk Chocolate Ganache",
+            "slug": "milk-chocolate-ganache",
+            "description": "A traditional flavour which offers a creamy and smooth texture to the chocolate. Perfect for chocolate lovers who want to stick to the classics.",
+            "mini_description": "Traditional flavour with a creamy texture",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/8/Milk_Chocolate_Ganache.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:04:30.223384Z",
+            "updated": "2023-07-03T10:17:20.530383Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 13,
+        "fields": {
+            "name": "Passionfruit, Blood Orange and Guava",
+            "slug": "passionfruit-blood-orange-and-guava",
+            "description": "This is our only tri-layered chocolate. The combination of the three flavours gives it a truly tropical and refreshing feel.",
+            "mini_description": "Three flavours for a tropical and refreshing taste",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/11/IMG_2490.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:04:51.636210Z",
+            "updated": "2024-08-30T08:27:01.235565Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 14,
+        "fields": {
+            "name": "Praline Feuilletine",
+            "slug": "praline-feuilletine",
+            "description": "One of our most popular flavours. We have mixed feuilletine into the praline to add an extra layer of crunch to the already delicious praline.",
+            "mini_description": "One of our most popular flavours with crunch!",
+            "allergens": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/13/Praline_Feuilletine.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:05:03.048155Z",
+            "updated": "2023-07-03T10:17:59.860721Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 15,
+        "fields": {
+            "name": "Strawberry and Vanilla",
+            "slug": "strawberry-and-vanilla",
+            "description": "One of our double layered bonbons, with the perfect blend of vanilla and strawberries.",
+            "mini_description": "A delicious double layered bonbon",
+            "allergens": [
+                1,
+                3
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/14/Strawberry_and_Vanilla.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2022-12-19T06:05:09.569453Z",
+            "updated": "2024-02-22T17:24:09.334159Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 16,
+        "fields": {
+            "name": "Tangy mango",
+            "slug": "tangy-mango",
+            "description": "Try our Mexican inspired tangy mango bonbon. The perfect balance between sweet and sour.",
+            "mini_description": "Mexican inspired tangy mango bonbon",
+            "allergens": [
+                1
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/17/Nameless_chocolate3.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2023-03-08T23:11:02.824102Z",
+            "updated": "2024-01-22T12:12:25.353268Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 17,
+        "fields": {
+            "name": "Whisky and Vanilla Caramel",
+            "slug": "whisky-and-vanilla-caramel",
+            "description": "A perfect after dinner treat",
+            "mini_description": "A perfect after dinner treat",
+            "allergens": [
+                1,
+                3,
+                5
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/29/5.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:29.173547Z",
+            "updated": "2024-09-24T21:49:52.258360Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 18,
+        "fields": {
+            "name": "Vanilla Pecan",
+            "slug": "vanilla-pecan",
+            "description": "This flavour has been in the works for a while. A remarkable sweet and nutty delight.",
+            "mini_description": "A remarkable sweet and nutty delight.",
+            "allergens": [
+                1,
+                3,
+                4,
+                6
+            ],
+            "image": "https://casspea-static-eu.s3-accelerate.amazonaws.com/static/flavour-img/24/Vanilla_pecan.jpg",
+            "category": 1,
+            "active": true,
+            "created": "2024-01-19T13:09:10.871813Z",
+            "updated": "2024-02-20T10:11:02.887088Z"
+        }
+    }
+]

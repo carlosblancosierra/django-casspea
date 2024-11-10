@@ -1,0 +1,11 @@
+[
+    {
+        "model": "flavours.flavourcategory",
+        "pk": 1,
+        "fields": {
+            "name": "Originals",
+            "slug": "originals",
+            "active": true
+        }
+    }
+]
