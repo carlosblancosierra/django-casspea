@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'users',
-    # 'products',
+    'products',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -149,3 +150,16 @@ CORS_ALLOW_CREDENTIALS = env.bool('CORS_ALLOW_CREDENTIALS', default=True)
 
 # Add this at the bottom of settings.py
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# Add REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'CassPea API',
+    'DESCRIPTION': 'CassPea Chocolate API documentation',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}

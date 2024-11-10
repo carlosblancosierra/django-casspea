@@ -32,12 +32,12 @@ class Product(models.Model):
     base_price = models.DecimalField(max_digits=10, decimal_places=2)
     stripe_price_id = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
-    weight = models.IntegerField()
+    weight = models.IntegerField(help_text="Weight in grams")
 
     active = models.BooleanField(default=True)
     sold_out = models.BooleanField(default=False)
 
-    units_per_box = models.IntegerField()
+    units_per_box = models.IntegerField(help_text="Number of chocolates in the box")
 
     main_color = models.CharField(max_length=255)
     secondary_color = models.CharField(max_length=255)

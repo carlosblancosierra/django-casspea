@@ -15,10 +15,10 @@
             "sold_out": false,
             "main_color": "blue",
             "secondary_color": "brown",
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
             "seo_title": "48 Piece Signature Chocolate Box",
-            "seo_description": "Indulge in 48 hand-crafted bonbons with a delightful selection of flavours. Perfect for gifting or personal indulgence."
+            "seo_description": "Indulge in 48 hand-crafted bonbons with a delightful selection of flavours. Perfect for gifting or personal indulgence.",
+            "created": "2024-01-01T11:00:00Z",
+            "updated": "2024-01-01T11:00:00Z"
         }
     },
     {
@@ -37,10 +37,10 @@
             "sold_out": false,
             "main_color": "orange",
             "secondary_color": "purple",
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
             "seo_title": "24 Piece Signature Chocolate Box",
-            "seo_description": "Indulge in a premium selection of 24 hand-crafted chocolates, each with its own distinct flavour. Ideal for gifting or a personal treat."
+            "seo_description": "Indulge in a premium selection of 24 hand-crafted chocolates, each with its own distinct flavour. Ideal for gifting or a personal treat.",
+            "created": "2024-01-01T11:15:00Z",
+            "updated": "2024-01-01T11:15:00Z"
         }
     },
     {
@@ -59,10 +59,10 @@
             "sold_out": false,
             "main_color": "green",
             "secondary_color": "light-blue",
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
             "seo_title": "15 Piece Signature Chocolate Box",
-            "seo_description": "Sample a delightful selection of 15 hand-crafted chocolates, perfect for a taste of indulgence or a thoughtful gift."
+            "seo_description": "Sample a delightful selection of 15 hand-crafted chocolates, perfect for a taste of indulgence or a thoughtful gift.",
+            "created": "2024-01-01T11:30:00Z",
+            "updated": "2024-01-01T11:30:00Z"
         }
     },
     {
@@ -81,10 +81,10 @@
             "sold_out": false,
             "main_color": "yellow",
             "secondary_color": "pink",
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
             "seo_title": "9 Piece Signature Chocolate Box",
-            "seo_description": "Enjoy a compact yet luxurious selection of 9 hand-made chocolates, perfect for gifting or a personal treat."
+            "seo_description": "Enjoy a compact yet luxurious selection of 9 hand-made chocolates, perfect for gifting or a personal treat.",
+            "created": "2024-01-01T11:45:00Z",
+            "updated": "2024-01-01T11:45:00Z"
         }
     }
 ]

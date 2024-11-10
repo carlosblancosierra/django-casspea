@@ -7,8 +7,8 @@
             "slug": "signature-boxes",
             "description": "Signature Boxes",
             "active": true,
-            "created": "2024-01-01T00:00:00Z",
-            "updated": "2024-01-01T00:00:00Z"
+            "created": "2024-01-01T10:00:00Z",
+            "updated": "2024-01-01T10:00:00Z"
         }
     },
     {
@@ -19,8 +19,8 @@
             "slug": "snacks",
             "description": "Signature Snacks",
             "active": true,
-            "created": "2024-01-01T00:00:00Z",
-            "updated": "2024-01-01T00:00:00Z"
+            "created": "2024-01-01T10:15:00Z",
+            "updated": "2024-01-01T10:15:00Z"
         }
     },
     {
@@ -31,8 +31,8 @@
             "slug": "signature-bars",
             "description": "Signature Bars",
             "active": true,
-            "created": "2024-01-01T00:00:00Z",
-            "updated": "2024-01-01T00:00:00Z"
+            "created": "2024-01-01T10:30:00Z",
+            "updated": "2024-01-01T10:30:00Z"
         }
     },
     {
@@ -43,8 +43,8 @@
             "slug": "advent-calendars",
             "description": "Advent Calendars",
             "active": true,
-            "created": "2024-01-01T00:00:00Z",
-            "updated": "2024-01-01T00:00:00Z"
+            "created": "2024-01-01T10:45:00Z",
+            "updated": "2024-01-01T10:45:00Z"
         }
     }
 ]
