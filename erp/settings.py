@@ -42,7 +42,6 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 # Application definition
 
 INSTALLED_APPS = [
-    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,6 +60,8 @@ INSTALLED_APPS = [
     'flavours',
     'products',
     'users',
+
+
 ]
 
 MIDDLEWARE = [
@@ -169,7 +170,7 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-# Add logging configuration
+# Add this to your settings
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -198,55 +199,34 @@ LOGGING = {
     },
 }
 
-# Add USE_S3 environment variable
-USE_S3 = env.bool('USE_S3', default=False)
+USE_S3 = env.bool('USE_S3', default=True)
+# AWS S3 Settings
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'casspea-v2'
+AWS_S3_REGION_NAME = 'eu-west-2'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+AWS_QUERYSTRING_AUTH = False
 
-if USE_S3:
-    # AWS S3 Settings
-    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default='casspea-v2')
-    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='eu-west-2')
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    AWS_DEFAULT_ACL = 'public-read'
-    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    AWS_QUERYSTRING_AUTH = False
+# Required local paths (keep these)
+STATIC_ROOT = '/vol/web/static'
+MEDIA_ROOT = '/vol/web/media'
 
-    # Storage settings
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+# Storage settings
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
 
-    # S3 paths
-    MEDIAFILES_LOCATION = 'media'
-    STATICFILES_LOCATION = 'static'
+# S3 paths
+MEDIAFILES_LOCATION = 'media'
+STATICFILES_LOCATION = 'static'
 
-    # URLs
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
+# URLs
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
 
-    # Static files dirs
-    STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, 'static')
-    ]
-
-    # Required local paths (you can keep these if needed)
-    STATIC_ROOT = '/vol/web/static'
-    MEDIA_ROOT = '/vol/web/media'
-else:
-    # Local storage settings
-    STATIC_URL = '/static/'
-    MEDIA_URL = '/media/'
-
-    # Static files dirs
-    STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, 'static')
-    ]
-
-    # Paths where collectstatic will collect static files
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Ensure STATIC_ROOT and MEDIA_ROOT are defined
-if not USE_S3:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Static files dirs
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
