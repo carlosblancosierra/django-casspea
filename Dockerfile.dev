@@ -2,8 +2,8 @@
 FROM python:3.11-slim
 
 # Set environment variables
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -14,11 +14,18 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory
 WORKDIR /app
 
-# Install Python dependencies
+# Copy and install Python dependencies
 COPY requirements.txt /app/
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy the app code
 COPY . /app/
 
+# Expose port 8000 (optional)
+EXPOSE 8000
+
+# Run collectstatic during the build process (optional)
+RUN python manage.py collectstatic --noinput
+
+# Command to run the app
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
