@@ -7,5 +7,6 @@ class ProductListView(ListAPIView):
     serializer_class = ProductSerializer
 
 class ProductDetailView(RetrieveAPIView):
+    lookup_field = 'slug'
     queryset = Product.objects.active()
     serializer_class = ProductSerializer
