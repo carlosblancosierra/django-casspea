@@ -199,34 +199,83 @@ LOGGING = {
     },
 }
 
+# Storage Configuration
+# ------------------------------------------------------------------------------
 USE_S3 = env.bool('USE_S3', default=True)
-# AWS S3 Settings
-AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = 'casspea-v2'
-AWS_S3_REGION_NAME = 'eu-west-2'
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-AWS_DEFAULT_ACL = 'public-read'
-AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-AWS_QUERYSTRING_AUTH = False
 
-# Required local paths (keep these)
-STATIC_ROOT = '/vol/web/static'
-MEDIA_ROOT = '/vol/web/media'
+# Base Static/Media Settings
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = Path('/vol/web/static')
+MEDIA_ROOT = Path('/vol/web/media')
 
-# Storage settings
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+if USE_S3:
+    # AWS S3 Configuration
+    AWS_CONFIG = {
+        'AWS_ACCESS_KEY_ID': env('AWS_ACCESS_KEY_ID'),
+        'AWS_SECRET_ACCESS_KEY': env('AWS_SECRET_ACCESS_KEY'),
+        'AWS_STORAGE_BUCKET_NAME': env('AWS_STORAGE_BUCKET_NAME', default='casspea-v2'),
+        'AWS_S3_REGION_NAME': env('AWS_S3_REGION_NAME', default='eu-west-2'),
+        'AWS_DEFAULT_ACL': 'public-read',
+        'AWS_QUERYSTRING_AUTH': False,
+        'AWS_S3_OBJECT_PARAMETERS': {
+            'CacheControl': 'max-age=86400',
+        },
+        # Optional performance settings
+        'AWS_S3_ADDRESSING_STYLE': 'virtual',  # Path-style is deprecated
+        'AWS_IS_GZIPPED': True,  # Enable gzip compression
+        'AWS_S3_FILE_OVERWRITE': False,  # Prevent accidental overrides
+    }
 
-# S3 paths
-MEDIAFILES_LOCATION = 'media'
-STATICFILES_LOCATION = 'static'
+    # Update settings with AWS config
+    locals().update(AWS_CONFIG)
 
-# URLs
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
+    # Set custom domain for CDN/S3
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
-# Static files dirs
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
+    # Storage Configuration using Django 4.2+ style
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+            'OPTIONS': {
+                'location': 'media',
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+            }
+        },
+        'staticfiles': {
+            'BACKEND': 'storages.backends.s3boto3.S3StaticStorage',
+            'OPTIONS': {
+                'location': 'static',
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+            }
+        }
+    }
+
+    # URLs for assets
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+
+else:
+    # Local Storage Configuration
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            'OPTIONS': {
+                'location': str(MEDIA_ROOT),
+                'base_url': '/media/',
+            }
+        },
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+            'OPTIONS': {
+                'location': str(STATIC_ROOT),
+                'base_url': '/static/',
+            }
+        }
+    }
+
+    STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'
+
+# Ensure storage directories exist
+for directory in [STATIC_ROOT, MEDIA_ROOT]:
+    directory.mkdir(parents=True, exist_ok=True)
