@@ -5,8 +5,10 @@ from .models import Cart, CartItem, Product
 from .serializers import CartSerializer, CartItemCreateSerializer
 from products.models import Product
 import logging
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, inline_serializer
 from drf_spectacular.types import OpenApiTypes
+from discounts.models import Discount
+from rest_framework import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,74 @@ class SessionCartView(APIView):
         cart = self.get_cart(request)
         serializer = CartSerializer(cart)
         return Response(serializer.data)
+
+    @extend_schema(
+        summary="Update cart details",
+        request=inline_serializer(
+            name='CartDetailsUpdate',
+            fields={
+                'gift_message': serializers.CharField(
+                    required=False,
+                    allow_null=True,
+                    help_text="Optional gift message"
+                ),
+                'shipping_date': serializers.DateField(
+                    required=False,
+                    allow_null=True,
+                    help_text="Optional shipping date (YYYY-MM-DD)"
+                )
+            }
+        ),
+        responses={
+            200: CartSerializer,
+            400: OpenApiTypes.OBJECT
+        },
+        examples=[
+            OpenApiExample(
+                'Gift Message Example',
+                value={
+                    'gift_message': 'Happy Birthday!',
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Shipping Date Example',
+                value={
+                    'shipping_date': '2024-12-25',
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Complete Example',
+                value={
+                    'gift_message': 'Happy Birthday!',
+                    'shipping_date': '2024-12-25'
+                },
+                request_only=True,
+            )
+        ],
+        description="Update cart with optional gift message and/or shipping date"
+    )
+    def post(self, request):
+        """Update cart details (gift message and/or shipping date)"""
+        cart = self.get_cart(request)
+
+        # Only allow gift_message and shipping_date to be updated
+        allowed_fields = {
+            k: v for k, v in request.data.items()
+            if k in ['gift_message', 'shipping_date']
+        }
+
+        serializer = CartSerializer(cart, data=allowed_fields, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "detail": "Cart details updated successfully",
+                "cart": serializer.data
+            }, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CartItemsView(APIView):
     def get_cart(self, request):
@@ -209,3 +279,90 @@ class CartItemView(APIView):
                 {"detail": "Cart item not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+class CartDiscountView(APIView):
+    def get_cart(self, request):
+        """Get or create session cart"""
+        if not request.session.session_key:
+            request.session.create()
+        cart, _ = Cart.objects.get_or_create(session_id=request.session.session_key)
+        return cart
+
+    @extend_schema(
+        summary="Apply discount to cart",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'code': {'type': 'string', 'description': 'Discount code'}
+                },
+                'required': ['code']
+            }
+        },
+        responses={
+            200: CartSerializer,
+            400: {"type": "object", "properties": {"detail": {"type": "string"}}}
+        }
+    )
+    def post(self, request):
+        """Apply discount to cart"""
+        code = request.data.get('code')
+        if not code:
+            return Response(
+                {"detail": "Discount code is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cart = self.get_cart(request)
+
+        # Validate discount using manager
+        is_valid, message, discount = Discount.objects.validate_discount_for_cart(code, cart)
+
+        if not is_valid:
+            return Response(
+                {"detail": message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Replace any existing discount
+        cart.discount = discount
+        cart.save()
+
+        # Format discount amount for message
+        discount_amount = (
+            f"{discount.amount}%"
+            if discount.discount_type == Discount.PERCENTAGE
+            else f"£{discount.amount}"
+        )
+
+        return Response({
+            "detail": message,
+            "cart": CartSerializer(cart).data
+        })
+
+    @extend_schema(
+        summary="Remove discount from cart",
+        responses={
+            200: {"type": "object", "properties": {
+                "detail": {"type": "string"},
+                "cart": {"type": "object"}
+            }}
+        }
+    )
+    def delete(self, request):
+        """Remove discount from cart"""
+        cart = self.get_cart(request)
+
+        if not cart.discount:
+            return Response({
+                "detail": "No discount applied to cart",
+                "cart": CartSerializer(cart).data
+            })
+
+        cart.discount = None
+        cart.save()
+
+        return Response({
+            "detail": "Discount removed from cart",
+            "cart": CartSerializer(cart).data
+        })

@@ -6,7 +6,8 @@ from allergens.serializers import AllergenSerializer
 from .models import Cart, CartItem, CartItemBoxCustomization, CartItemBoxFlavorSelection
 from products.models import Product
 from products.serializers import ProductSerializer
-
+from discounts.serializers import DiscountSerializer
+from django.utils import timezone
 # Read-only serializers (for GET requests)
 class CartItemBoxFlavorSelectionSerializer(serializers.ModelSerializer):
     flavor = FlavourSerializer()
@@ -34,13 +35,32 @@ class CartItemSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
     total = serializers.SerializerMethodField()
+    discount = DiscountSerializer(read_only=True)
+    gift_message = serializers.CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
+    shipping_date = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
         model = Cart
-        fields = ['id', 'items', 'total']
+        fields = [
+            'id',
+            'items',
+            'total',
+            'discount',
+            'gift_message',
+            'shipping_date'
+        ]
+
+    def validate_shipping_date(self, value):
+        """
+        Validate shipping date is not in the past
+        """
+        if value and value < timezone.now().date():
+            raise serializers.ValidationError("Shipping date cannot be in the past")
+        return value
 
     def get_total(self, obj):
         return str(sum(item.quantity * item.product.base_price for item in obj.items.all()))
+
 
 # Write serializers (for POST/PUT requests)
 class CartItemBoxFlavorSelectionCreateSerializer(serializers.ModelSerializer):
