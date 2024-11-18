@@ -5,6 +5,8 @@ from .models import Cart, CartItem, Product
 from .serializers import CartSerializer, CartItemCreateSerializer
 from products.models import Product
 import logging
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,11 @@ class SessionCartView(APIView):
         cart, _ = Cart.objects.get_or_create(session_id=request.session.session_key)
         return cart
 
+    @extend_schema(
+        summary="Get or create session cart",
+        description="Returns the current cart for the session or creates a new one",
+        responses={200: CartSerializer}
+    )
     def get(self, request):
         """Get or create a session cart"""
         cart = self.get_cart(request)
@@ -28,6 +35,32 @@ class CartItemsView(APIView):
         cart, _ = Cart.objects.get_or_create(session_id=request.session.session_key)
         return cart
 
+    @extend_schema(
+        summary="Add item to cart",
+        request=CartItemCreateSerializer,
+        responses={
+            201: CartSerializer,
+            400: OpenApiTypes.OBJECT,
+            404: OpenApiTypes.OBJECT
+        },
+        examples=[
+            OpenApiExample(
+                'Valid Request',
+                value={
+                    "product": 1,
+                    "quantity": 1,
+                    "box_customization": {
+                        "selection_type": "PICK_AND_MIX",
+                        "allergens": [1],
+                        "flavor_selections": [
+                            {"flavor": 1, "quantity": 24},
+                            {"flavor": 2, "quantity": 24}
+                        ]
+                    }
+                }
+            )
+        ]
+    )
     def post(self, request):
         """Add item to cart"""
         cart = self.get_cart(request)
@@ -52,7 +85,7 @@ class CartItemsView(APIView):
             )
 
         logger.debug(f"CartItemsView post request data: {request.data}")
-        
+
         if serializer.is_valid():
             try:
                 cart_item = serializer.save(cart=cart)
@@ -76,6 +109,23 @@ class CartItemView(APIView):
         cart, _ = Cart.objects.get_or_create(session_id=request.session.session_key)
         return cart
 
+    @extend_schema(
+        summary="Update cart item",
+        parameters=[
+            OpenApiParameter(
+                name='pk',
+                type=int,
+                location=OpenApiParameter.PATH,
+                description='Cart item ID'
+            )
+        ],
+        request=CartItemCreateSerializer,
+        responses={
+            200: CartSerializer,
+            400: OpenApiTypes.OBJECT,
+            404: OpenApiTypes.OBJECT
+        }
+    )
     def put(self, request, pk):
         """Update cart item"""
         try:
@@ -130,6 +180,21 @@ class CartItemView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+    @extend_schema(
+        summary="Delete cart item",
+        parameters=[
+            OpenApiParameter(
+                name='pk',
+                type=int,
+                location=OpenApiParameter.PATH,
+                description='Cart item ID'
+            )
+        ],
+        responses={
+            200: CartSerializer,
+            404: OpenApiTypes.OBJECT
+        }
+    )
     def delete(self, request, pk):
         """Remove item from cart"""
         try:
