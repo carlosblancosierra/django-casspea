@@ -173,3 +173,38 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
                     )
 
         return instance
+
+class CartUpdateSerializer(serializers.ModelSerializer):
+    gift_message = serializers.CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
+    shipping_date = serializers.DateField(required=False, allow_null=True)
+    discount_code = serializers.CharField(required=False, allow_null=True, write_only=True)
+
+    class Meta:
+        model = Cart
+        fields = [
+            'gift_message',
+            'shipping_date',
+            'discount_code'
+        ]
+
+    def validate_shipping_date(self, value):
+        if value and value < timezone.now().date():
+            raise serializers.ValidationError("Shipping date cannot be in the past")
+        return value
+
+    def update(self, instance, validated_data):
+        discount_code = validated_data.pop('discount_code', None)
+
+        if discount_code is not None:
+            if discount_code == '':  # Remove discount if empty string
+                instance.discount = None
+            else:  # Try to apply new discount
+                is_valid, message, discount = Discount.objects.validate_discount_for_cart(
+                    discount_code,
+                    instance
+                )
+                if not is_valid:
+                    raise serializers.ValidationError({"discount_code": message})
+                instance.discount = discount
+
+        return super().update(instance, validated_data)

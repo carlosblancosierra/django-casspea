@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Cart, CartItem, Product
-from .serializers import CartSerializer, CartItemCreateSerializer
+from .serializers import CartSerializer, CartItemCreateSerializer, CartUpdateSerializer
 from products.models import Product
 import logging
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, inline_serializer
@@ -44,6 +44,11 @@ class SessionCartView(APIView):
                     required=False,
                     allow_null=True,
                     help_text="Optional shipping date (YYYY-MM-DD)"
+                ),
+                'discount_code': serializers.CharField(
+                    required=False,
+                    allow_null=True,
+                    help_text="Discount code to apply (empty string to remove)"
                 )
             }
         ),
@@ -54,47 +59,47 @@ class SessionCartView(APIView):
         examples=[
             OpenApiExample(
                 'Gift Message Example',
-                value={
-                    'gift_message': 'Happy Birthday!',
-                },
+                value={'gift_message': 'Happy Birthday!'},
                 request_only=True,
             ),
             OpenApiExample(
                 'Shipping Date Example',
-                value={
-                    'shipping_date': '2024-12-25',
-                },
+                value={'shipping_date': '2024-12-25'},
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Discount Example',
+                value={'discount_code': 'SUMMER2023'},
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Remove Discount Example',
+                value={'discount_code': ''},
                 request_only=True,
             ),
             OpenApiExample(
                 'Complete Example',
                 value={
                     'gift_message': 'Happy Birthday!',
-                    'shipping_date': '2024-12-25'
+                    'shipping_date': '2024-12-25',
+                    'discount_code': 'BLACK24'
                 },
                 request_only=True,
             )
         ],
-        description="Update cart with optional gift message and/or shipping date"
+        description="Update cart with optional gift message, shipping date, and/or discount code"
     )
     def post(self, request):
-        """Update cart details (gift message and/or shipping date)"""
+        """Update cart details"""
         cart = self.get_cart(request)
-
-        # Only allow gift_message and shipping_date to be updated
-        allowed_fields = {
-            k: v for k, v in request.data.items()
-            if k in ['gift_message', 'shipping_date']
-        }
-
-        serializer = CartSerializer(cart, data=allowed_fields, partial=True)
+        serializer = CartUpdateSerializer(cart, data=request.data, partial=True)
 
         if serializer.is_valid():
-            serializer.save()
+            cart = serializer.save()
             return Response({
-                "detail": "Cart details updated successfully",
-                "cart": serializer.data
-            }, status=status.HTTP_200_OK)
+                "detail": "Cart updated successfully",
+                "cart": CartSerializer(cart).data
+            })
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
