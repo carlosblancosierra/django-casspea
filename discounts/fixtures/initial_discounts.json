@@ -1,0 +1,19 @@
+[
+    {
+        "model": "discounts.discount",
+        "pk": 1,
+        "fields": {
+            "title": "Newsletter Signup Discount",
+            "code": "NEWS10",
+            "stripe_id": "NEWS10_PERCENT_OFF",
+            "discount_type": "PERCENTAGE",
+            "amount": "10.00",
+            "active": true,
+            "start_date": null,
+            "end_date": null,
+            "min_order_value": 0,
+            "created": "2024-01-01T00:00:00Z",
+            "updated": "2024-01-01T00:00:00Z"
+        }
+    }
+]

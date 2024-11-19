@@ -17,12 +17,18 @@ services:
     volumes:
       - .:/app
       - static-data:/vol/web/static
+      - ./.vscode:/app/.vscode
     ports:
       - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
     depends_on:
       - db
     networks:
       - ecommerce_network
+    stdin_open: true
+    tty: true
 
   db:
     image: postgres:14

@@ -8,7 +8,8 @@ from products.models import Product
 from products.serializers import ProductSerializer
 from discounts.serializers import DiscountSerializer
 from django.utils import timezone
-# Read-only serializers (for GET requests)
+from discounts.models import Discount
+
 class CartItemBoxFlavorSelectionSerializer(serializers.ModelSerializer):
     flavor = FlavourSerializer()
 
@@ -69,7 +70,7 @@ class CartItemBoxFlavorSelectionCreateSerializer(serializers.ModelSerializer):
         fields = ['flavor', 'quantity']
 
 class CartItemBoxCustomizationCreateSerializer(serializers.ModelSerializer):
-    flavor_selections = CartItemBoxFlavorSelectionCreateSerializer(many=True)
+    flavor_selections = CartItemBoxFlavorSelectionCreateSerializer(many=True, required=False)
     allergens = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Allergen.objects.all(),
@@ -91,18 +92,29 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Validate the complete data set"""
         product = data['product']
-
         box_customization = data.get('box_customization', None)
-        if box_customization:
-            flavor_selections = box_customization.get('flavor_selections', [])
-            total_quantity = sum(fs['quantity'] for fs in flavor_selections)
 
-            if total_quantity != product.units_per_box:
-                raise serializers.ValidationError({
-                    'box_customization': {
-                        'flavor_selections': f"Total flavor quantity must equal {product.units_per_box} (got {total_quantity})"
-                    }
-                })
+        if box_customization:
+            # Only validate flavor selections for PICK_AND_MIX
+            if box_customization.get('selection_type') == 'PICK_AND_MIX':
+                flavor_selections = box_customization.get('flavor_selections', [])
+                total_quantity = sum(fs['quantity'] for fs in flavor_selections)
+
+                if total_quantity != product.units_per_box:
+                    raise serializers.ValidationError({
+                        'box_customization': {
+                            'flavor_selections': f"Total flavor quantity must equal {product.units_per_box} (got {total_quantity})"
+                        }
+                    })
+            elif box_customization.get('selection_type') == 'RANDOM':
+                # For RANDOM selection, flavor_selections should be empty or None
+                if box_customization.get('flavor_selections'):
+                    raise serializers.ValidationError({
+                        'box_customization': {
+                            'flavor_selections': "Flavor selections should not be provided for RANDOM selection type"
+                        }
+                    })
+
         return data
 
     def create(self, validated_data):
