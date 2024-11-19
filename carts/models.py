@@ -4,6 +4,8 @@ from products.models import Product, Allergen
 from flavours.models import Flavour
 from discounts.models import Discount
 
+from .managers import CartManager
+
 class Cart(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     session_id = models.CharField(max_length=255, null=True, blank=True)
@@ -11,8 +13,12 @@ class Cart(models.Model):
     gift_message = models.CharField(max_length=255, null=True, blank=True)
     shipping_date = models.DateField(null=True, blank=True)
 
+    active = models.BooleanField(default=True)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    objects = CartManager()
 
     class Meta:
         indexes = [

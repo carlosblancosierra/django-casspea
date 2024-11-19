@@ -1,0 +1,12 @@
+{
+    "venvPath": "/usr/local/bin",
+    "venv": "python3.11",
+    "extraPaths": [
+        "/app",
+        "/usr/local/lib/python3.11/site-packages"
+    ],
+    "typeCheckingMode": "basic",
+    "useLibraryCodeForTypes": true,
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": false
+}

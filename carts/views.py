@@ -59,6 +59,20 @@ class CartView(APIView):
         },
         examples=[
             OpenApiExample(
+                'Complete Example',
+                value={
+                    'gift_message': 'Happy Birthday!',
+                    'shipping_date': '2024-12-25',
+                    'discount_code': 'BLACK24'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Remove Discount Example',
+                value={'discount_code': ''},
+                request_only=True,
+            ),
+            OpenApiExample(
                 'Gift Message Example',
                 value={'gift_message': 'Happy Birthday!'},
                 request_only=True,
@@ -73,20 +87,7 @@ class CartView(APIView):
                 value={'discount_code': 'SUMMER2023'},
                 request_only=True,
             ),
-            OpenApiExample(
-                'Remove Discount Example',
-                value={'discount_code': ''},
-                request_only=True,
-            ),
-            OpenApiExample(
-                'Complete Example',
-                value={
-                    'gift_message': 'Happy Birthday!',
-                    'shipping_date': '2024-12-25',
-                    'discount_code': 'BLACK24'
-                },
-                request_only=True,
-            )
+
         ],
         description="Update cart with optional gift message, shipping date, and/or discount code"
     )
@@ -104,6 +105,7 @@ class CartView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class CartItemViewSet(viewsets.ViewSet):
     def get_cart(self, request):
         if not request.session.session_key:
@@ -114,7 +116,40 @@ class CartItemViewSet(viewsets.ViewSet):
     @extend_schema(
         summary="Add item to cart",
         request=CartItemCreateSerializer,
-        responses={201: CartSerializer}
+        responses={201: CartSerializer},
+        examples=[
+            OpenApiExample(
+                'Random Box Example',
+                value={
+                    "product": 1,
+                    "quantity": 3,
+                    "box_customization": {
+                        "selection_type": "RANDOM",
+                        "allergens": [
+                            1
+                        ]
+                    }
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Custom Box Example',
+                value={
+                    "product": 1,
+                    "quantity": 3,
+                    "box_customization": {
+                        "selection_type": "CUSTOM",
+                        "flavor_selections": [
+                            {
+                                "flavor": 1,
+                                "quantity": 48
+                            }
+                        ]
+                    }
+                },
+                request_only=True,
+            )
+        ]
     )
     def create(self, request):
         """POST /items/"""

@@ -1,25 +1,24 @@
-from django.db import models
-from rest_framework import serializers
-from checkout.models import CheckoutSession, Address
-
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = [
-            'id', 'street', 'city', 'state', 'zipcode', 'country'
-        ]
+from django.db import models  # type: ignore
+from rest_framework import serializers  # type: ignore
+from checkout.models import CheckoutSession
+from addresses.serializers import AddressSerializer
+from django.utils import timezone # type: ignore
+from datetime import timedelta
+from addresses.models import Address
 
 class CheckoutSessionSerializer(serializers.ModelSerializer):
-    shipping_address = AddressSerializer()
-    billing_address = AddressSerializer()
+    shipping_address = AddressSerializer(read_only=True)
+    billing_address = AddressSerializer(read_only=True)
+    cart_total = serializers.DecimalField(
+        source='cart.total',
+        max_digits=10,
+        decimal_places=2,
+        read_only=True
+    )
 
     class Meta:
         model = CheckoutSession
-        fields = [
-            'id', 'cart', 'shipping_address', 'billing_address',
-            'email', 'phone', 'status', 'created_at'
-        ]
-        read_only_fields = ['status', 'created_at']
+        fields = '__all__'
 
     def validate(self, data):
         cart = data.get('cart')
@@ -33,40 +32,62 @@ class CheckoutSessionSerializer(serializers.ModelSerializer):
         return data
 
 class CheckoutDetailsSerializer(serializers.ModelSerializer):
-    shipping_address = AddressSerializer()
-    billing_address = AddressSerializer()
+    shipping_address_id = serializers.IntegerField(required=True)
+    billing_address_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = CheckoutSession
-        fields = ['shipping_address', 'billing_address', 'email', 'phone']
+        fields = ['shipping_address_id', 'billing_address_id', 'email', 'phone']
+
+    def validate(self, data):
+        request = self.context['request']
+
+        # Validate shipping address
+        shipping_id = data.get('shipping_address_id')
+        try:
+            if request.user.is_authenticated:
+                Address.objects.get(id=shipping_id, user=request.user)
+            else:
+                Address.objects.get(
+                    id=shipping_id,
+                    session_key=request.session.session_key,
+                    created__gte=timezone.now() - timedelta(hours=24)
+                )
+        except Address.DoesNotExist:
+            raise serializers.ValidationError({
+                "shipping_address_id": "Invalid shipping address ID"
+            })
+
+        # Validate billing address if provided
+        billing_id = data.get('billing_address_id')
+        if billing_id:
+            try:
+                if request.user.is_authenticated:
+                    Address.objects.get(id=billing_id, user=request.user)
+                else:
+                    Address.objects.get(
+                        id=billing_id,
+                        session_key=request.session.session_key,
+                        created__gte=timezone.now() - timedelta(hours=24)
+                    )
+            except Address.DoesNotExist:
+                raise serializers.ValidationError({
+                    "billing_address_id": "Invalid billing address ID"
+                })
+
+        return data
 
     def update(self, instance, validated_data):
-        # Handle shipping address
-        shipping_data = validated_data.pop('shipping_address', None)
-        if shipping_data:
-            if instance.shipping_address:
-                for attr, value in shipping_data.items():
-                    setattr(instance.shipping_address, attr, value)
-                instance.shipping_address.save()
-            else:
-                address = Address.objects.create(**shipping_data)
-                if instance.cart.user:
-                    address.user = instance.cart.user
-                    address.save()
-                instance.shipping_address = address
+        shipping_id = validated_data.pop('shipping_address_id', None)
+        billing_id = validated_data.pop('billing_address_id', None)
 
-        # Handle billing address (similar logic)
-        billing_data = validated_data.pop('billing_address', None)
-        if billing_data:
-            if instance.billing_address:
-                for attr, value in billing_data.items():
-                    setattr(instance.billing_address, attr, value)
-                instance.billing_address.save()
-            else:
-                address = Address.objects.create(**billing_data)
-                if instance.cart.user:
-                    address.user = instance.cart.user
-                    address.save()
-                instance.billing_address = address
+        if shipping_id:
+            instance.shipping_address_id = shipping_id
+            # Use billing address same as shipping if not provided
+            if not billing_id:
+                instance.billing_address_id = shipping_id
+
+        if billing_id:
+            instance.billing_address_id = billing_id
 
         return super().update(instance, validated_data)

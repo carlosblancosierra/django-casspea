@@ -2,15 +2,20 @@ from django.db import models
 from django.conf import settings
 
 class Address(models.Model):
+    SHIPPING_ADDRESS = 'SHIPPING'
+    BILLING_ADDRESS = 'BILLING'
+
     ADDRESS_TYPE_CHOICES = [
-        ('SHIPPING', 'Shipping'),
-        ('BILLING', 'Billing'),
+        (SHIPPING_ADDRESS, 'Shipping Address'),
+        (BILLING_ADDRESS, 'Billing Address'),
     ]
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='addresses'
+        related_name='addresses',
+        null=True,
+        blank=True
     )
     address_type = models.CharField(
         max_length=20,
@@ -48,10 +53,17 @@ class Address(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    # Guest user fields
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+
     class Meta:
         verbose_name_plural = 'addresses'
         unique_together = [['user', 'address_type', 'is_default']]
         ordering = ['-is_default', '-created']
+        indexes = [
+            models.Index(fields=['session_key']),
+            models.Index(fields=['user']),
+        ]
 
     def __str__(self):
         return f"{self.full_name} - {self.formatted_address}"
@@ -65,3 +77,7 @@ class Address(models.Model):
                 is_default=True
             ).update(is_default=False)
         super().save(*args, **kwargs)
+
+    @classmethod
+    def get_session_addresses(cls, session_key):
+        return cls.objects.filter(session_key=session_key)

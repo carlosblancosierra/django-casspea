@@ -57,11 +57,13 @@ INSTALLED_APPS = [
 
     # Custom apps
     'allergens',
+    'addresses',
     'flavours',
     'carts',
     'products',
     'users',
     'discounts',
+    'checkout',
 
 
 ]
@@ -186,18 +188,18 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
         },
-        'botocore': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-        'storages': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-        'erp.storage_backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
+        # 'botocore': {
+        #     'handlers': ['console'],
+        #     'level': 'DEBUG',
+        # },
+        # 'storages': {
+        #     'handlers': ['console'],
+        #     'level': 'DEBUG',
+        # },
+        # 'erp.storage_backends': {
+        #     'handlers': ['console'],
+        #     'level': 'DEBUG',
+        # },
     },
 }
 
@@ -281,3 +283,9 @@ else:
 # Ensure storage directories exist
 for directory in [STATIC_ROOT, MEDIA_ROOT]:
     directory.mkdir(parents=True, exist_ok=True)
+
+
+# Stripe settings
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
