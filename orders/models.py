@@ -2,13 +2,15 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 from django.utils import timezone
-
+from .managers import OrderManager
+import random
 User = get_user_model()
 
 def generate_order_id():
     """Generate a unique order ID"""
     # Format: CASSPEA-DDMMYY-NNNN
-    return f'CASSPEA-{timezone.now().strftime("%d%m%y")}/{get_random_string(4).upper()}'
+    random_int = random.randint(1000, 9999)
+    return f'CASSPEA-{timezone.now().strftime("%d%m%y")}-{random_int}'
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -20,7 +22,7 @@ class Order(models.Model):
     ]
 
     order_id = models.CharField(
-        max_length=12,
+        max_length=100,
         unique=True,
         default=generate_order_id,
         editable=False
@@ -46,6 +48,8 @@ class Order(models.Model):
 
     shipped = models.DateTimeField(null=True, blank=True)
     delivered = models.DateTimeField(null=True, blank=True)
+
+    objects = OrderManager()
 
     class Meta:
         ordering = ['-created']
@@ -83,6 +87,7 @@ class Order(models.Model):
         if Order.objects.filter(order_id=self.order_id).exists():
             self.order_id = generate_order_id()
         super().save(*args, **kwargs)
+
 
 class OrderStatusHistory(models.Model):
     """Track order status changes"""

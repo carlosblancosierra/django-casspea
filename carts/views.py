@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 
 class CartView(APIView):
     def get_cart(self, request):
-        if not request.session.session_key:
-            request.session.create()
-        cart, _ = Cart.objects.get_or_create(session_id=request.session.session_key)
+        cart, _ = Cart.objects.get_or_create_from_request(request)
         return cart
 
     @extend_schema(
@@ -107,11 +105,6 @@ class CartView(APIView):
 
 
 class CartItemViewSet(viewsets.ViewSet):
-    def get_cart(self, request):
-        if not request.session.session_key:
-            request.session.create()
-        cart, _ = Cart.objects.get_or_create(session_id=request.session.session_key)
-        return cart
 
     @extend_schema(
         summary="Add item to cart",
@@ -153,7 +146,7 @@ class CartItemViewSet(viewsets.ViewSet):
     )
     def create(self, request):
         """POST /items/"""
-        cart = self.get_cart(request)
+        cart, _ = Cart.objects.get_or_create_from_request(request)
         serializer = CartItemCreateSerializer(data=request.data)
 
         # Validate product ID and quantity

@@ -42,14 +42,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = [
-            'id',
-            'items',
-            'total',
-            'discount',
-            'gift_message',
-            'shipping_date'
-        ]
+        fields = '__all__'
 
     def validate_shipping_date(self, value):
         """

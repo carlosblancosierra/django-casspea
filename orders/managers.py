@@ -1,6 +1,5 @@
 import structlog
 from django.db import models
-from orders.models import Order, OrderStatusHistory
 
 logger = structlog.get_logger(__name__)
 
@@ -11,12 +10,12 @@ class OrderManager(models.Manager):
         """
         try:
             # Check if order already exists
-            if Order.objects.filter(checkout_session=checkout_session).exists():
-                logger.warning(
+            if self.filter(checkout_session=checkout_session).exists():
+                logger.info(
                     "order_already_exists",
                     checkout_session_id=checkout_session.id
                 )
-                return Order.objects.get(checkout_session=checkout_session)
+                return self.objects.get(checkout_session=checkout_session)
 
             logger.info(
                 "creating_order_from_checkout",
@@ -28,13 +27,6 @@ class OrderManager(models.Manager):
             order = self.create(
                 checkout_session=checkout_session,
                 status='processing'
-            )
-
-            # Create initial status history
-            OrderStatusHistory.objects.create(
-                order=order,
-                status='processing',
-                notes='Order created from successful payment'
             )
 
             logger.info(

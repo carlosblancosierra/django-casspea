@@ -1,5 +1,6 @@
 import structlog
 from django.db import models
+from django.db import transaction
 
 logger = structlog.get_logger(__name__)
 
@@ -15,42 +16,42 @@ class CartManager(models.Manager):
             is_authenticated=request.user.is_authenticated
         )
 
-        if request.user.is_authenticated:
-            # First try to get existing active cart
-            cart = self.filter(
-                user=request.user,
-                active=True
-            ).order_by('-created').first()
+        with transaction.atomic():
+            if request.user.is_authenticated:
+                return self._get_or_create_user_cart(request.user)
+            else:
+                return self._get_or_create_session_cart(request)
 
-            if cart:
-                logger.info(
-                    "found_existing_user_cart",
-                    cart_id=cart.id,
-                    user_id=request.user.id,
-                    items_count=cart.items.count()
-                )
-                return cart, False
+    def _get_or_create_user_cart(self, user):
+        """Handle authenticated user carts"""
+        # Lock the rows to prevent race conditions
+        active_cart = self.select_for_update().filter(
+            user=user,
+            active=True
+        ).first()
 
-            # Create new cart for user
+        if active_cart:
             logger.info(
-                "creating_new_user_cart",
-                user_id=request.user.id
+                "found_active_user_cart",
+                cart_id=active_cart.id,
+                user_id=user.id,
+                items_count=active_cart.items.count()
             )
-            cart = self.create(
-                user=request.user,
-                session_id=None,
-                active=True
-            )
+            return active_cart, False
 
-            logger.info(
-                "new_user_cart_created",
-                cart_id=cart.id,
-                user_id=cart.user_id,
-                session_id=cart.session_id
-            )
-            return cart, True
+        # Create new cart (no reactivation)
+        logger.info(
+            "creating_new_user_cart",
+            user_id=user.id
+        )
+        return self.create(
+            user=user,
+            session_id=None,
+            active=True
+        ), True
 
-        # For anonymous users only
+    def _get_or_create_session_cart(self, request):
+        """Handle anonymous session carts"""
         if not request.session.session_key:
             request.session.create()
             logger.info(
@@ -58,42 +59,28 @@ class CartManager(models.Manager):
                 session_id=request.session.session_key
             )
 
-        # Check existing session carts
-        existing_carts = self.filter(
+        # Lock the rows to prevent race conditions
+        active_cart = self.select_for_update().filter(
             session_id=request.session.session_key,
-            user__isnull=True,
             active=True
-        ).order_by('-created')
+        ).first()
 
-        logger.debug(
-            "existing_session_carts",
-            session_id=request.session.session_key,
-            carts_count=existing_carts.count(),
-            carts=[{
-                'id': c.id,
-                'created': c.created,
-                'items_count': c.items.count()
-            } for c in existing_carts]
-        )
-
-        cart = existing_carts.first()
-        if cart:
+        if active_cart:
             logger.info(
-                "found_existing_session_cart",
-                cart_id=cart.id,
+                "found_active_session_cart",
+                cart_id=active_cart.id,
                 session_id=request.session.session_key,
-                items_count=cart.items.count(),
-                created=cart.created
+                items_count=active_cart.items.count()
             )
-            return cart, False
+            return active_cart, False
 
+        # Create new cart (no reactivation)
         logger.info(
             "creating_new_session_cart",
             session_id=request.session.session_key
         )
-        cart = self.create(
+        return self.create(
             session_id=request.session.session_key,
             user=None,
             active=True
-        )
-        return cart, True
+        ), True
