@@ -11,36 +11,70 @@ class CheckoutSessionManager(models.Manager):
         """
         from carts.models import Cart
 
-        logger.debug(
-            "creating_checkout_from_request",
+        logger.info(
+            "checkout_session_request_started",
             user_id=getattr(request.user, 'id', None),
-            session_id=request.session.session_key
+            session_id=request.session.session_key,
+            is_authenticated=request.user.is_authenticated,
+            request_data=request.data if hasattr(request, 'data') else None
         )
 
         try:
             # Use Cart manager to get the active cart
             cart, is_new_cart = Cart.objects.get_or_create_from_request(request)
 
-            # First check for any existing pending session for this cart
-            existing_session = self.filter(
+            logger.info(
+                "cart_status_for_checkout",
+                cart_id=cart.id,
+                is_new_cart=is_new_cart,
+                user_id=cart.user_id if cart.user else None,
+                session_id=cart.session_id,
+                items_count=cart.items.count(),
+                cart_active=cart.active
+            )
+
+            # Check for existing sessions
+            existing_sessions = self.filter(
                 cart=cart,
-            ).select_related('cart').order_by('-created').first()
+            ).select_related('cart')
+
+            logger.debug(
+                "existing_sessions_check",
+                cart_id=cart.id,
+                sessions_count=existing_sessions.count(),
+                sessions=[{
+                    'id': s.id,
+                    'status': s.payment_status,
+                    'created': s.created
+                } for s in existing_sessions]
+            )
+
+            existing_session = existing_sessions.order_by('-created').first()
 
             if existing_session:
                 logger.info(
                     "existing_checkout_session_found",
                     checkout_session_id=existing_session.id,
                     cart_id=cart.id,
-                    items_count=cart.items.count()
+                    items_count=cart.items.count(),
+                    payment_status=existing_session.payment_status,
+                    created=existing_session.created
                 )
-                # Update email if provided for guest checkout
+                # Update email if provided
                 if not cart.user and 'email' in request.data:
                     existing_session.email = request.data['email']
                     existing_session.save(update_fields=['email'])
                 return existing_session
 
-            # If no existing session, create new one
+            # Create new session
             email = cart.user.email if cart.user else request.data.get('email')
+
+            logger.debug(
+                "creating_new_checkout_session",
+                cart_id=cart.id,
+                email=email,
+                user_id=cart.user_id if cart.user else None
+            )
 
             checkout_session = self.create(
                 cart=cart,
@@ -62,7 +96,9 @@ class CheckoutSessionManager(models.Manager):
             logger.error(
                 "checkout_session_creation_failed",
                 error=str(e),
+                error_type=type(e).__name__,
                 user_id=getattr(request.user, 'id', None),
+                session_id=request.session.session_key,
                 exc_info=True
             )
             raise

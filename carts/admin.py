@@ -45,7 +45,7 @@ class CartAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Cart Information', {
-            'fields': ('user', 'session_id', 'discount')
+            'fields': ('user', 'session_id', 'discount', 'active')
         }),
         ('Additional Information', {
             'fields': ('gift_message', 'shipping_date')
