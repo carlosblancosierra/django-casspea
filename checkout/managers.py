@@ -8,7 +8,6 @@ class CheckoutSessionManager(models.Manager):
     def get_or_create_from_request(self, request):
         """
         Get or create checkout session from request.
-        Handles cart creation/retrieval internally.
         """
         from carts.models import Cart
 
@@ -19,32 +18,30 @@ class CheckoutSessionManager(models.Manager):
         )
 
         try:
-            # Get or create cart first
-            cart = Cart.objects.get_or_create_from_request(request)[0]
+            # Use Cart manager to get the active cart
+            cart, is_new_cart = Cart.objects.get_or_create_from_request(request)
 
-            # Try to get existing checkout session for this cart
-            checkout_session = self.filter(cart=cart).order_by('-created').first()
+            # First check for any existing pending session for this cart
+            existing_session = self.filter(
+                cart=cart,
+            ).select_related('cart').order_by('-created').first()
 
-            if checkout_session:
+            if existing_session:
                 logger.info(
                     "existing_checkout_session_found",
-                    checkout_session_id=checkout_session.id,
-                    cart_id=cart.id
+                    checkout_session_id=existing_session.id,
+                    cart_id=cart.id,
+                    items_count=cart.items.count()
                 )
-                # Update email if provided in request
+                # Update email if provided for guest checkout
                 if not cart.user and 'email' in request.data:
-                    checkout_session.email = request.data['email']
-                    checkout_session.save()
-                return checkout_session
+                    existing_session.email = request.data['email']
+                    existing_session.save(update_fields=['email'])
+                return existing_session
 
-            # For new session
-            email = None
-            if cart.user:
-                email = cart.user.email
-            elif 'email' in request.data:
-                email = request.data['email']
+            # If no existing session, create new one
+            email = cart.user.email if cart.user else request.data.get('email')
 
-            # Create new session
             checkout_session = self.create(
                 cart=cart,
                 email=email
@@ -54,6 +51,7 @@ class CheckoutSessionManager(models.Manager):
                 "new_checkout_session_created",
                 checkout_session_id=checkout_session.id,
                 cart_id=cart.id,
+                items_count=cart.items.count(),
                 is_guest=not cart.user,
                 email=email
             )
@@ -72,18 +70,9 @@ class CheckoutSessionManager(models.Manager):
     def validate_session(self, session_id):
         """
         Validate a checkout session is ready for payment.
-
-        Args:
-            session_id: ID of the checkout session
-
-        Returns:
-            CheckoutSession instance
-
-        Raises:
-            ValidationError: If session is invalid
         """
         try:
-            session = self.get(id=session_id)
+            session = self.select_related('cart').get(id=session_id)
 
             if not session.shipping_address:
                 raise ValidationError("Shipping address is required")
@@ -100,7 +89,8 @@ class CheckoutSessionManager(models.Manager):
             logger.info(
                 "checkout_session_validated",
                 checkout_session_id=session.id,
-                cart_id=session.cart.id
+                cart_id=session.cart.id,
+                items_count=session.cart.items.count()
             )
 
             return session

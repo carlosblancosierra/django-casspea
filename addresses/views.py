@@ -1,16 +1,13 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Address
 from .serializers import AddressSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from django.utils import timezone
-from datetime import timedelta
-from carts.models import Cart
 from checkout.models import CheckoutSession
 
 import structlog
+
 logger = structlog.get_logger(__name__)
 
 SHIPPING_ADDRESS_EXAMPLE = {
