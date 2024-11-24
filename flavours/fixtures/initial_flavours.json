@@ -352,10 +352,10 @@
         "model": "flavours.flavour",
         "pk": 20,
         "fields": {
-            "name": "Whisky and Vanilla Caramel",
-            "slug": "whisky-and-vanilla-caramel",
-            "description": "A perfect after dinner treat",
-            "mini_description": "A perfect after dinner treat",
+            "name": "Vanilla Pecan",
+            "slug": "vanilla-pecan",
+            "description": "A remarkable sweet and nutty delight.",
+            "mini_description": "A remarkable sweet and nutty delight.",
             "allergens": [
                 1,
                 3,
