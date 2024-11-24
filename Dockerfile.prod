@@ -42,19 +42,16 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
 # Copy entrypoint script first
-COPY entrypoint.prod.sh $APP_HOME/entrypoint.prod.sh
-
-# Set script permissions (more explicit)
-RUN chmod 755 $APP_HOME/entrypoint.prod.sh && \
-    sed -i 's/\r$//g' $APP_HOME/entrypoint.prod.sh
+COPY entrypoint.prod.sh .
+RUN chmod +x entrypoint.prod.sh
 
 # Copy project files
-COPY . $APP_HOME
+COPY . .
 
 # Set ownership and permissions
 RUN chown -R app:app $APP_HOME && \
     chmod -R 755 $APP_HOME && \
-    chmod 755 $APP_HOME/entrypoint.prod.sh
+    chmod +x entrypoint.prod.sh
 
 USER app
 
