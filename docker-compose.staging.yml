@@ -11,6 +11,9 @@ services:
     command: gunicorn erp.wsgi:application --bind 0.0.0.0:8000
     expose:
       - 8000
+    volumes:
+      - static_volume:/vol/web/static
+      - media_volume:/vol/web/media
     env_file:
       - ./.env.staging
     networks:
@@ -26,6 +29,8 @@ services:
       - 80:80
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/vol/web/static
+      - media_volume:/vol/web/media
     depends_on:
       - web
     networks:
@@ -34,3 +39,7 @@ services:
 networks:
   django-casspea-net:
     name: django-casspea-network
+
+volumes:
+  static_volume:
+  media_volume:
