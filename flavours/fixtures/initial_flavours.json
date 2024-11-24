@@ -132,10 +132,46 @@
         "model": "flavours.flavour",
         "pk": 8,
         "fields": {
+            "name": "Eggnog",
+            "slug": "eggnog",
+            "description": "Rich, creamy, and perfectly spiced, this bonbon captures the warmth of traditional eggnog in every bite.",
+            "mini_description": "Rich, creamy, and perfectly spiced.",
+            "allergens": [
+                1
+            ],
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:29.173547Z",
+            "updated": "2024-09-24T21:49:52.258360Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 9,
+        "fields": {
+            "name": "Gingerbread",
+            "slug": "gingerbread",
+            "description": "This flavour is a Christmas classic. Bring back some childhood memories through our gingerbread seasonal flavour.",
+            "mini_description": "A Christmas classic.",
+            "allergens": [
+                1,
+                3,
+                5
+            ],
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:39.615263Z",
+            "updated": "2024-09-24T21:49:24.021333Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 10,
+        "fields": {
             "name": "Horchata",
             "slug": "horchata",
             "description": "Inspired by a traditional Mexican drink that is made up of cinnamon, rice and milk.",
-            "mini_description": "Inspired by a traditional Mexican drink made up of cinnamon, rice, and milk",
+            "mini_description": "Inspired by a traditional Mexican drink made up of cinnamon, rice, and milk.",
             "allergens": [
                 1,
                 3
@@ -148,7 +184,7 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 9,
+        "pk": 11,
         "fields": {
             "name": "Key Lime Pie",
             "slug": "key-lime-pie",
@@ -167,7 +203,7 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 10,
+        "pk": 12,
         "fields": {
             "name": "Mango and Passionfruit Caramel",
             "slug": "mango-and-passionfruit-caramel",
@@ -185,7 +221,7 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 11,
+        "pk": 13,
         "fields": {
             "name": "Maple Crunch",
             "slug": "maple-crunch",
@@ -204,7 +240,7 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 12,
+        "pk": 14,
         "fields": {
             "name": "Milk Chocolate Ganache",
             "slug": "milk-chocolate-ganache",
@@ -222,7 +258,26 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 13,
+        "pk": 15,
+        "fields": {
+            "name": "Mulled Wine",
+            "slug": "mulled-wine",
+            "description": "Indulge in this wonderfully traditional flavour this Christmas season.",
+            "mini_description": "A wonderfully traditional flavour.",
+            "allergens": [
+                1,
+                3,
+                5
+            ],
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:29.173547Z",
+            "updated": "2024-09-24T21:49:52.258360Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 16,
         "fields": {
             "name": "Passionfruit, Blood Orange and Guava",
             "slug": "passionfruit-blood-orange-and-guava",
@@ -234,13 +289,13 @@
             ],
             "category": 1,
             "active": true,
-            "created": "2022-12-19T06:04:51.636210Z",
+            "created": "2022-12-19T06:0451.636210Z",
             "updated": "2024-08-30T08:27:01.235565Z"
         }
     },
     {
         "model": "flavours.flavour",
-        "pk": 14,
+        "pk": 17,
         "fields": {
             "name": "Praline Feuilletine",
             "slug": "praline-feuilletine",
@@ -260,7 +315,7 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 15,
+        "pk": 18,
         "fields": {
             "name": "Strawberry and Vanilla",
             "slug": "strawberry-and-vanilla",
@@ -278,7 +333,7 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 16,
+        "pk": 19,
         "fields": {
             "name": "Tangy mango",
             "slug": "tangy-mango",
@@ -295,31 +350,12 @@
     },
     {
         "model": "flavours.flavour",
-        "pk": 17,
+        "pk": 20,
         "fields": {
             "name": "Whisky and Vanilla Caramel",
             "slug": "whisky-and-vanilla-caramel",
             "description": "A perfect after dinner treat",
             "mini_description": "A perfect after dinner treat",
-            "allergens": [
-                1,
-                3,
-                5
-            ],
-            "category": 1,
-            "active": true,
-            "created": "2024-08-30T08:27:29.173547Z",
-            "updated": "2024-09-24T21:49:52.258360Z"
-        }
-    },
-    {
-        "model": "flavours.flavour",
-        "pk": 18,
-        "fields": {
-            "name": "Vanilla Pecan",
-            "slug": "vanilla-pecan",
-            "description": "This flavour has been in the works for a while. A remarkable sweet and nutty delight.",
-            "mini_description": "A remarkable sweet and nutty delight.",
             "allergens": [
                 1,
                 3,
@@ -330,6 +366,25 @@
             "active": true,
             "created": "2024-01-19T13:09:10.871813Z",
             "updated": "2024-02-20T10:11:02.887088Z"
+        }
+    },
+    {
+        "model": "flavours.flavour",
+        "pk": 21,
+        "fields": {
+            "name": "Whisky and Vanilla Caramel",
+            "slug": "whisky-and-vanilla-caramel",
+            "description": "A perfect after dinner treat.\n\n*Contains Milk Solids and Soy.",
+            "mini_description": "A perfect after dinner treat.",
+            "allergens": [
+                1,
+                3,
+                5
+            ],
+            "category": 1,
+            "active": true,
+            "created": "2024-08-30T08:27:29.173547Z",
+            "updated": "2024-09-24T21:49:52.258360Z"
         }
     }
 ]
