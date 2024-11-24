@@ -153,12 +153,30 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
-CORS_ORIGIN_ALLOW_ALL = env.bool('CORS_ORIGIN_ALLOW_ALL', default=True)
-CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
-    'http://localhost:4000',
-    'http://127.0.0.1:4000'
-])
-CORS_ALLOW_CREDENTIALS = env.bool('CORS_ALLOW_CREDENTIALS', default=True)
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://main.d29kjbfnh50hd9.amplifyapp.com',
+    'https://casspea-v2.s3.eu-west-2.amazonaws.com',
+    'https://casspea.co.uk',
+    'https://www.casspea.co.uk',
+    'https://www2.casspea.co.uk',
+]
+
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://main.d29kjbfnh50hd9.amplifyapp.com',
+    'https://casspea-v2.s3.eu-west-2.amazonaws.com',
+    'https://casspea.co.uk',
+    'https://www.casspea.co.uk',
+    'https://www2.casspea.co.uk',
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Add this at the bottom of settings.py
 AUTH_USER_MODEL = 'users.CustomUser'
