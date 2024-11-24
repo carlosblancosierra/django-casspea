@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 ENVIRONMENT = env('ENVIRONMENT', default='development')
 
 # Security settings
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY', default='23i872fysadv9qf3ygv138v9y138v13yvy30')
 DEBUG = env.bool('DEBUG', default=True)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
