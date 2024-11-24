@@ -16,9 +16,9 @@ services:
     networks:
       - django-casspea-net
 
-  nginx:
+  nginx-proxy:
     platform: linux/amd64
-    container_name: django-casspea-nginx
+    container_name: nginx-proxy
     build: nginx
     image: 071222593443.dkr.ecr.eu-west-2.amazonaws.com/django-casspea:nginx-proxy
     restart: always

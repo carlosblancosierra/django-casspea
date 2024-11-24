@@ -63,3 +63,4 @@ USER app
 
 # run entrypoint.prod.sh
 ENTRYPOINT ["/entrypoint.prod.sh"]
+CMD ["gunicorn", "erp.wsgi:application", "--bind", "0.0.0.0:8000"]

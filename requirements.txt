@@ -9,3 +9,4 @@ boto3==1.34.34
 Pillow==10.2.0
 stripe
 structlog
+gunicorn==21.2.0
