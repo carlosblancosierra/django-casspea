@@ -41,6 +41,10 @@ ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
 
+# create static and media directories
+RUN mkdir -p /vol/web/static
+RUN mkdir -p /vol/web/media
+
 # install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends netcat
 COPY --from=builder /usr/src/app/wheels /wheels
@@ -55,12 +59,13 @@ RUN chmod +x /entrypoint.prod.sh
 # copy project
 COPY . $APP_HOME
 
-# chown all the files to the app user
+# set permissions
 RUN chown -R app:app $APP_HOME
+RUN chown -R app:app /vol
+RUN chmod -R 755 /vol/web
 
 # change to the app user
 USER app
 
-# run entrypoint.prod.sh
 ENTRYPOINT ["/entrypoint.prod.sh"]
 CMD ["gunicorn", "erp.wsgi:application", "--bind", "0.0.0.0:8000"]
