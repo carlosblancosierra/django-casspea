@@ -29,6 +29,12 @@ from drf_spectacular.views import (
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import health_check
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({'detail': 'CSRF cookie set'})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,6 +47,7 @@ urlpatterns = [
     path('api/checkout/', include(checkout_urls)),
     path('api/addresses/', include(addresses_urls)),
     path('health/', health_check, name='health_check'),
+    path('api/csrf/', get_csrf_token),
 ]
 
 if settings.DEBUG and not settings.USE_S3:
