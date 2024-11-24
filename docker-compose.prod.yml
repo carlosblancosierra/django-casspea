@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: 071222593443.dkr.ecr.eu-west-2.amazonaws.com/django-casspea:web
+    container_name: django-casspea-web
+    command: gunicorn erp.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+    volumes:
+      - static_volume:/vol/web/static
+      - media_volume:/vol/web/media
+    env_file:
+      - ./.env.staging
+    networks:
+      - django-casspea-net
+
+  nginx-proxy:
+    platform: linux/amd64
+    container_name: nginx-proxy
+    build: nginx
+    image: 071222593443.dkr.ecr.eu-west-2.amazonaws.com/django-casspea:nginx-proxy
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/vol/web/static
+      - media_volume:/vol/web/media
+    depends_on:
+      - web
+    networks:
+      - django-casspea-net
+
+networks:
+  django-casspea-net:
+    name: django-casspea-network
+
+volumes:
+  static_volume:
+  media_volume:
