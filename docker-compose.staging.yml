@@ -18,28 +18,10 @@ services:
     image: 071222593443.dkr.ecr.eu-west-2.amazonaws.com/django-casspea:nginx-proxy
     restart: always
     ports:
-      - 443:443
       - 80:80
     volumes:
-      - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - web
 
-  acme-companion:
-    image: nginxproxy/acme-companion
-    env_file:
-      - ./.env.staging.proxy-companion
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
-      - acme:/etc/acme.sh
-    depends_on:
-      - nginx-proxy
-
 volumes:
-  certs:
-  html:
-  acme:
