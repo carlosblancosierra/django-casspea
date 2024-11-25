@@ -7,6 +7,14 @@ EC2_USER="ubuntu"
 EC2_IP="18.135.11.8"
 KEY_PATH="~/.ssh/django-casspea.pem"
 
+# Step 1: Copy necessary files to EC2
+echo "Copying configuration files to EC2..."
+scp -i $KEY_PATH \
+    docker-compose.prod.yml \
+    .env.prod \
+    .env.prod.proxy-companion \
+    $EC2_USER@$EC2_IP:/home/ubuntu/django-casspea/
+
 # Step 2: Build and Push using production docker-compose
 echo "Building and pushing Docker images..."
 docker-compose -f docker-compose.prod.yml build

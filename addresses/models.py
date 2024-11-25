@@ -35,18 +35,8 @@ class Address(models.Model):
     # Google Places data
     place_id = models.CharField(max_length=255, blank=True)
     formatted_address = models.CharField(max_length=255, blank=True)
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True
-    )
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True
-    )
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
 
     # Metadata
     is_default = models.BooleanField(default=False)
@@ -58,7 +48,6 @@ class Address(models.Model):
 
     class Meta:
         verbose_name_plural = 'addresses'
-        unique_together = [['user', 'address_type', 'is_default']]
         ordering = ['-is_default', '-created']
         indexes = [
             models.Index(fields=['session_key']),

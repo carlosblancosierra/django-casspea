@@ -34,8 +34,8 @@ class StripeCheckoutSessionView(APIView):
         The user will be redirected to Stripe's hosted checkout page to complete payment.
         """,
         responses={
-            302: OpenApiResponse(
-                description="Redirect to Stripe Checkout"
+            200: OpenApiResponse(
+                description="Stripe Checkout Session URL"
             ),
             400: OpenApiResponse(
                 description="Validation Error",
@@ -153,7 +153,7 @@ class StripeCheckoutSessionView(APIView):
 
             # Discount handling
             discounts = []
-            if checkout_session.cart.discount and checkout_session.cart.discount.is_valid():
+            if checkout_session.cart.discount and checkout_session.cart.discount.is_valid:
                 discounts = [{'coupon': checkout_session.cart.discount.stripe_id}]
 
 
@@ -194,7 +194,7 @@ class StripeCheckoutSessionView(APIView):
 
             return Response(
                 {"url": stripe_session.url},
-                status=302
+                status=200
             )
 
         except ValidationError as e:

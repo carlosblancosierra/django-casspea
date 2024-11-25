@@ -47,7 +47,11 @@ class CartView(APIView):
                 'discount_code': serializers.CharField(
                     required=False,
                     allow_null=True,
-                    help_text="Discount code to apply (empty string to remove)"
+                    help_text="Discount code to apply"
+                ),
+                'remove_discount': serializers.BooleanField(
+                    required=False,
+                    help_text="Set to true to remove the current discount"
                 )
             }
         ),
@@ -67,7 +71,7 @@ class CartView(APIView):
             ),
             OpenApiExample(
                 'Remove Discount Example',
-                value={'discount_code': ''},
+                value={'remove_discount': True},
                 request_only=True,
             ),
             OpenApiExample(
@@ -92,6 +96,15 @@ class CartView(APIView):
     def post(self, request):
         """Update cart details"""
         cart = self.get_cart(request)
+
+        # Handle discount removal first
+        if request.data.get('remove_discount'):
+            cart.discount = None
+            cart.save()
+            # Remove both fields from data to prevent serializer processing
+            request.data.pop('remove_discount', None)
+            request.data.pop('discount_code', None)
+
         serializer = CartUpdateSerializer(cart, data=request.data, partial=True)
 
         if serializer.is_valid():

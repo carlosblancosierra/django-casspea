@@ -19,49 +19,31 @@ class DiscountManager(models.Manager):
             models.Q(end_date__isnull=True) | models.Q(end_date__gte=now)
         )
 
-    def validate_discount_for_cart(self, code: str, cart) -> tuple[bool, str, 'Discount']:
+    def is_valid(self, discount_instance) -> bool:
         """
-        Validates if a discount can be applied to a cart
+        Check if a specific discount instance is currently valid
 
         Args:
-            code (str): Discount code
-            cart (Cart): Cart instance to validate against
+            discount_instance (Discount): The discount instance to check
 
         Returns:
-            tuple: (is_valid: bool, message: str, discount: Optional[Discount])
+            bool: True if the discount is valid, False otherwise
         """
-        try:
-            # Check if discount exists and is valid
-            discount = self.get_valid_discounts().get(code__iexact=code)
+        if not discount_instance:
+            return False
 
-            # Calculate cart total for eligible items
-            excluded_products = discount.exclusions.all()
-            eligible_total = sum(
-                item.quantity * item.product.base_price
-                for item in cart.items.all()
-                if item.product not in excluded_products
-            )
+        now = timezone.now()
 
-            # Check minimum order value on eligible items
-            if eligible_total < Decimal(str(discount.min_order_value)):
-                return False, f"Eligible order total must be at least {discount.min_order_value} to use this discount", None
+        if not discount_instance.active:
+            return False
 
-            # Calculate how many items are eligible vs excluded
-            total_items = cart.items.count()
-            excluded_items = sum(1 for item in cart.items.all() if item.product in excluded_products)
+        if discount_instance.start_date and discount_instance.start_date > now:
+            return False
 
-            # Add a warning message if some items are excluded
-            message = "Discount is valid"
-            if excluded_items > 0:
-                message = f"Discount will be applied to {total_items - excluded_items} out of {total_items} items"
+        if discount_instance.end_date and discount_instance.end_date < now:
+            return False
 
-            return True, message, discount
-
-        except self.model.DoesNotExist:
-            return False, "Invalid or expired discount code", None
-        except Exception as e:
-            logger.error(f"Error validating discount code {code}: {str(e)}")
-            return False, "Error validating discount code", None
+        return True
 
 class Discount(models.Model):
     PERCENTAGE = "PERCENTAGE"
@@ -109,3 +91,24 @@ class Discount(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
+
+    @property
+    def is_valid(self) -> bool:
+        """Check if this discount is currently valid"""
+        return Discount.objects.is_valid(self)
+
+    @property
+    def status(self) -> str:
+        """Returns the current status of the discount"""
+        if not self.active:
+            return "inactive"
+
+        now = timezone.now()
+
+        if self.start_date and self.start_date > now:
+            return "scheduled"
+
+        if self.end_date and self.end_date < now:
+            return "expired"
+
+        return "active"
