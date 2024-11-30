@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 from addresses.models import Address
+from shipping.models import ShippingOption
 
 from .managers import CheckoutSessionManager
 
@@ -49,6 +50,13 @@ class CheckoutSession(models.Model):
     stripe_payment_intent = models.CharField(max_length=255, null=True, blank=True)
     stripe_session_id = models.CharField(max_length=255, null=True, blank=True)
 
+    shipping_option = models.ForeignKey(
+        ShippingOption,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     objects = CheckoutSessionManager()
 
     def save(self, *args, **kwargs):
@@ -60,3 +68,19 @@ class CheckoutSession(models.Model):
         elif not self.email:
             raise ValueError("Email is required for guest checkout")
         super().save(*args, **kwargs)
+
+    @property
+    def shipping_cost(self):
+        if not self.shipping_option:
+            return 0
+
+        # Free shipping logic for Regular 48
+        if (self.shipping_option.delivery_speed == 'REGULAR' and
+            self.cart.base_total >= 45):
+            return 0
+
+        return self.shipping_option.price
+
+    @property
+    def total_with_shipping(self):
+        return float(self.cart.total) + float(self.shipping_cost)

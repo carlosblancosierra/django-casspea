@@ -1,0 +1,63 @@
+[
+  {
+    "model": "shipping.shippingcompany",
+    "pk": 1,
+    "fields": {
+      "name": "Royal Mail",
+      "code": "royal-mail",
+      "active": true,
+      "website": "https://www.royalmail.com",
+      "track_url": "https://www.royalmail.com/track-your-item",
+      "created": "2024-01-01T00:00:00Z",
+      "updated": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "shipping.shippingoption",
+    "pk": 1,
+    "fields": {
+      "company": 1,
+      "name": "Priority 24",
+      "delivery_speed": "PRIORITY",
+      "price": "4.99",
+      "estimated_days_min": 1,
+      "estimated_days_max": 1,
+      "description": "Priority 24-hour delivery service",
+      "active": true,
+      "created": "2024-01-01T00:00:00Z",
+      "updated": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "shipping.shippingoption",
+    "pk": 2,
+    "fields": {
+      "company": 1,
+      "name": "Regular 48",
+      "delivery_speed": "REGULAR",
+      "price": "3.99",
+      "estimated_days_min": 2,
+      "estimated_days_max": 2,
+      "description": "Standard 48-hour delivery service (Free for orders over £45)",
+      "active": true,
+      "created": "2024-01-01T00:00:00Z",
+      "updated": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "shipping.shippingoption",
+    "pk": 3,
+    "fields": {
+      "company": 1,
+      "name": "Next Day Guaranteed",
+      "delivery_speed": "NEXT_DAY",
+      "price": "11.99",
+      "estimated_days_min": 1,
+      "estimated_days_max": 1,
+      "description": "Guaranteed next day delivery service",
+      "active": true,
+      "created": "2024-01-01T00:00:00Z",
+      "updated": "2024-01-01T00:00:00Z"
+    }
+  }
+]

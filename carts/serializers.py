@@ -28,21 +28,56 @@ class CartItemBoxCustomizationSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
     box_customization = CartItemBoxCustomizationSerializer()
+    base_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    discounted_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    savings = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = CartItem
-        fields = ['id', 'quantity', 'product', 'box_customization']
+        fields = [
+            'id',
+            'quantity',
+            'product',
+            'box_customization',
+            'base_price',
+            'discounted_price',
+            'savings'
+        ]
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
-    total = serializers.SerializerMethodField()
     discount = DiscountSerializer(read_only=True)
     gift_message = serializers.CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
     shipping_date = serializers.DateField(required=False, allow_null=True)
+    base_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    discounted_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    total_savings = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    is_discount_valid = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Cart
-        fields = '__all__'
+        fields = [
+            'id',
+            'items',
+            'discount',
+            'gift_message',
+            'shipping_date',
+            'base_total',
+            'discounted_total',
+            'total_savings',
+            'is_discount_valid',
+            'created',
+            'updated'
+        ]
+
+    def validate(self, data):
+        """Validate the cart data"""
+        if self.instance and self.instance.discount:
+            if not self.instance.is_discount_valid:
+                raise serializers.ValidationError({
+                    "discount": f"Order total must be at least £{self.instance.discount.min_order_value} to use this discount code"
+                })
+        return data
 
     def validate_shipping_date(self, value):
         """

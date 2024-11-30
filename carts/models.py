@@ -20,6 +20,43 @@ class Cart(models.Model):
 
     objects = CartManager()
 
+    @property
+    def base_total(self):
+        """Calculate the total before any discounts"""
+        return sum(item.base_price for item in self.items.all())
+
+    @property
+    def discounted_total(self):
+        """Calculate the total after applying discount"""
+        if not self.discount or not self.discount.status[0]:
+            return self.base_total
+
+        # For percentage discounts
+        if self.discount.discount_type == 'PERCENTAGE':
+            non_excluded_total = sum(
+                item.base_price
+                for item in self.items.all()
+                if item.product not in self.discount.exclusions.all()
+            )
+            excluded_total = self.base_total - non_excluded_total
+            discount_amount = (non_excluded_total * self.discount.amount) / 100
+            return max(self.base_total - discount_amount, 0)
+
+        # For fixed amount discounts
+        return max(self.base_total - self.discount.amount, 0)
+
+    @property
+    def total_savings(self):
+        """Calculate total amount saved due to discount"""
+        return max(self.base_total - self.discounted_total, 0)
+
+    @property
+    def is_discount_valid(self):
+        """Check if cart meets minimum order value for discount"""
+        if not self.discount:
+            return False
+        return self.base_total >= self.discount.min_order_value
+
     class Meta:
         indexes = [
             models.Index(fields=['session_id']),
@@ -34,6 +71,31 @@ class CartItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    @property
+    def base_price(self):
+        """Calculate the base price for this item"""
+        return self.product.base_price * self.quantity
+
+    @property
+    def discounted_price(self):
+        """Calculate the discounted price if a discount exists"""
+        if not self.cart or not self.cart.discount:
+            return self.base_price
+
+        # Skip if product is in exclusions
+        if self.product in self.cart.discount.exclusions.all():
+            return self.base_price
+
+        if self.cart.discount.discount_type == 'PERCENTAGE':
+            discount_amount = (self.base_price * self.cart.discount.amount) / 100
+            return max(self.base_price - discount_amount, 0)
+
+    @property
+    def savings(self):
+        """Calculate the amount saved due to discount"""
+        if self.discounted_price is None:
+            return 0
+        return max(self.base_price - self.discounted_price, 0)
 
     class Meta:
         indexes = [

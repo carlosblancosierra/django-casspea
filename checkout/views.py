@@ -14,7 +14,7 @@ from django.utils.decorators import method_decorator
 import stripe
 from django.conf import settings
 from orders.models import Order
-
+from shipping.models import ShippingOption
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -234,3 +234,47 @@ class CheckoutViewSet(viewsets.ViewSet):
         except Exception as e:
             logger.error("Webhook error", error=str(e), exc_info=True)
             return HttpResponse(status=500)
+
+    @extend_schema(
+        summary="Update shipping option",
+        description="Updates the shipping option for the checkout session",
+        request={"shipping_option_id": "integer"},
+        responses={200: CheckoutSessionSerializer}
+    )
+    @action(detail=True, methods=['post'], url_path='shipping-option')
+    def update_shipping_option(self, request, pk=None):
+        try:
+            checkout_session = CheckoutSession.objects.get(id=pk)
+            shipping_option_id = request.data.get('shipping_option_id')
+
+            if not shipping_option_id:
+                return Response(
+                    {'error': 'shipping_option_id is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            try:
+                shipping_option = ShippingOption.objects.get(
+                    id=shipping_option_id,
+                    active=True,
+                    company__active=True
+                )
+            except ShippingOption.DoesNotExist:
+                return Response(
+                    {'error': 'Invalid shipping option'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            checkout_session.shipping_option = shipping_option
+            checkout_session.save()
+
+            return Response(
+                CheckoutSessionSerializer(checkout_session).data,
+                status=status.HTTP_200_OK
+            )
+
+        except CheckoutSession.DoesNotExist:
+            return Response(
+                {'error': 'Checkout session not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
