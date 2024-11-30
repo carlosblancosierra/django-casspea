@@ -200,16 +200,20 @@ class CartUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         discount_code = validated_data.pop('discount_code', None)
 
-        if discount_code is not None:
-            if discount_code == '':  # Remove discount if empty string
-                instance.discount = None
-            else:  # Try to apply new discount
-                is_valid, message, discount = Discount.objects.validate_discount_for_cart(
-                    discount_code,
-                    instance
-                )
-                if not is_valid:
-                    raise serializers.ValidationError({"discount_code": message})
-                instance.discount = discount
+        try:
+            if discount_code is not None:
+                if discount_code == '':
+                    instance.discount = None
+                else:  # Try to apply new discount
+                    discount = Discount.objects.get(code=discount_code)
+                    if not discount.status[0]:
+                        raise serializers.ValidationError({"discount_code": discount.status[1]})
+                    instance.discount = discount
+        except Discount.DoesNotExist:
+            raise serializers.ValidationError({"discount_code": "Invalid discount code provided."})
+        except serializers.ValidationError as e:
+            raise e
+        except Exception as e:
+            raise serializers.ValidationError({"discount_code": f"An unexpected error occurred: {str(e)}"})
 
         return super().update(instance, validated_data)

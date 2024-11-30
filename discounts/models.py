@@ -93,22 +93,17 @@ class Discount(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def is_valid(self) -> bool:
-        """Check if this discount is currently valid"""
-        return Discount.objects.is_valid(self)
-
-    @property
-    def status(self) -> str:
+    def status(self) -> tuple[bool, str]:
         """Returns the current status of the discount"""
         if not self.active:
-            return "inactive"
+            return False, "inactive"
 
         now = timezone.now()
 
         if self.start_date and self.start_date > now:
-            return "scheduled"
+            return False, "scheduled"
 
         if self.end_date and self.end_date < now:
-            return "expired"
+            return False, "expired"
 
-        return "active"
+        return True, "active"

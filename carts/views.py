@@ -97,15 +97,17 @@ class CartView(APIView):
         """Update cart details"""
         cart = self.get_cart(request)
 
+        # Create a mutable copy of the request data
+        data = request.data.copy()
+
         # Handle discount removal first
-        if request.data.get('remove_discount'):
+        if data.get('remove_discount'):
             cart.discount = None
             cart.save()
-            # Remove both fields from data to prevent serializer processing
-            request.data.pop('remove_discount', None)
-            request.data.pop('discount_code', None)
+            data.pop('remove_discount', None)
+            data.pop('discount_code', None)
 
-        serializer = CartUpdateSerializer(cart, data=request.data, partial=True)
+        serializer = CartUpdateSerializer(cart, data=data, partial=True)
 
         if serializer.is_valid():
             cart = serializer.save()
