@@ -182,14 +182,15 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
 class CartUpdateSerializer(serializers.ModelSerializer):
     gift_message = serializers.CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
     shipping_date = serializers.DateField(required=False, allow_null=True)
-    discount_code = serializers.CharField(required=False, allow_null=True, write_only=True)
-
+    discount_code = serializers.CharField(required=False, allow_null=True, allow_blank=True, write_only=True)
+    remove_discount = serializers.BooleanField(required=False, write_only=True)
     class Meta:
         model = Cart
         fields = [
             'gift_message',
             'shipping_date',
-            'discount_code'
+            'discount_code',
+            'remove_discount'
         ]
 
     def validate_shipping_date(self, value):
@@ -199,13 +200,13 @@ class CartUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         discount_code = validated_data.pop('discount_code', None)
-
+        remove_discount = validated_data.pop('remove_discount', None)
         try:
             if discount_code is not None:
                 if discount_code == '':
                     instance.discount = None
                 else:  # Try to apply new discount
-                    discount = Discount.objects.get(code=discount_code)
+                    discount = Discount.objects.get(code__iexact=discount_code)
                     if not discount.status[0]:
                         raise serializers.ValidationError({"discount_code": discount.status[1]})
                     instance.discount = discount

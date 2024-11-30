@@ -99,13 +99,12 @@ class CartView(APIView):
 
         # Create a mutable copy of the request data
         data = request.data.copy()
-
+        logger.debug(f"Update request data: {data}")
         # Handle discount removal first
         if data.get('remove_discount'):
             cart.discount = None
             cart.save()
             data.pop('remove_discount', None)
-            data.pop('discount_code', None)
 
         serializer = CartUpdateSerializer(cart, data=data, partial=True)
 
