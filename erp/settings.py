@@ -174,6 +174,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www2.casspea.co.uk',
     'https://api.casspea.co.uk',
     'https://new.casspea.co.uk',
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
