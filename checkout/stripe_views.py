@@ -149,7 +149,7 @@ class StripeCheckoutSessionView(APIView):
                 },
             }
 
-            API_DOMAIN = "https://localhost:8000"
+            API_DOMAIN = "new.casspea.co.uk"
 
             # Discount handling
             discounts = []
