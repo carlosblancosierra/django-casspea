@@ -149,7 +149,9 @@ class StripeCheckoutSessionView(APIView):
                 },
             }
 
+            PROTOCOL = "https"
             API_DOMAIN = "new.casspea.co.uk"
+            FULL_API_DOMAIN = f"{PROTOCOL}://{API_DOMAIN}"
 
             # Discount handling
             discounts = []
@@ -168,8 +170,8 @@ class StripeCheckoutSessionView(APIView):
                 discounts=discounts,
                 shipping_options=shipping_options,
                 client_reference_id=str(checkout_session.id),
-                success_url=f"{API_DOMAIN}/api/checkout/stripe/success?session_id={checkout_session.id}",
-                cancel_url=f"{API_DOMAIN}/api/checkout/stripe/cancel?session_id={checkout_session.id}",
+                success_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/success?session_id={checkout_session.id}",
+                cancel_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/cancel?session_id={checkout_session.id}",
                 invoice_creation=invoice_creation,
                 custom_text={
                     'submit': {
