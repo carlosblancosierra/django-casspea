@@ -18,12 +18,15 @@ logger = structlog.get_logger(__name__)
 def stripe_webhook(request):
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    stripe.api_key = settings.STRIPE_SECRET_KEY
 
     logger.info("Received Stripe webhook", event_type="unknown")
 
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+    logger.info("endpoint_secret", endpoint_secret=endpoint_secret)
+
     try:
-        endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
-        logger.info("endpoint_secret", endpoint_secret=endpoint_secret)
+
         if not endpoint_secret:
             logger.error("endpoint_secret is not set in settings")
             return HttpResponse(status=500)
