@@ -22,6 +22,7 @@ from carts.urls import carts_urls
 from checkout.urls import urlpatterns as checkout_urls
 from addresses.urls import urlpatterns as addresses_urls
 from shipping.urls import urlpatterns as shipping_urls
+from leads.urls import urlpatterns as leads_urls
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
@@ -50,6 +51,7 @@ urlpatterns = [
     path('health/', health_check, name='health_check'),
     path('api/csrf/', get_csrf_token),
     path('api/shipping/', include(shipping_urls)),
+    path('api/leads/', include(leads_urls)),
 ]
 
 if settings.DEBUG and not settings.USE_S3:

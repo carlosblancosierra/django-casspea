@@ -12,4 +12,5 @@ router.register(r'session', CheckoutViewSet, basename='session')
 urlpatterns = [
     path('', include(router.urls)),
     path('stripe/create-checkout-session', StripeCheckoutSessionView.as_view(), name='stripe-create-checkout-session'),
+    path('stripe/webhook', stripe_webhook, name='stripe-webhook'),
 ]

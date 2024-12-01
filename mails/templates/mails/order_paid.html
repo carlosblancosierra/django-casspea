@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your CassPea Order Confirmation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Inter Font Integration -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+
+    <style>
+        /* Reset Styles */
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+        }
+
+        /* Inter Font Class */
+        .inter-custom {
+            font-family: "Inter", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif; /* Fallback font */
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #817df5 100%);
+            padding: 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .header img {
+            width: 150px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .hero {
+            background-color: #4f46e5;
+            padding: 40px 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .hero h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .button, .hero .button {
+            background-color: #ffffff;
+            color: #4f46e5;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+        .content h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #4f46e5;
+        }
+        .content p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .discount-code {
+            background-color: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-size: 16px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        .order-summary {
+            margin-top: 20px;
+            border-top: 1px solid #dddddd;
+            padding-top: 20px;
+        }
+        .order-summary table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-summary th, .order-summary td {
+            text-align: left;
+            padding: 8px 0;
+        }
+        .order-summary th {
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        .footer {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+            color: #777777;
+            font-size: 12px;
+        }
+        .footer a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+            }
+            .header img {
+                width: 100px;
+            }
+            .hero h1 {
+                font-size: 24px;
+            }
+            .hero p, .content p {
+                font-size: 14px;
+            }
+            .button, .hero .button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container inter-custom">
+        <!-- Header Section -->
+        <div class="header">
+            <a href="https://new.casspea.co.uk/" style="text-decoration: none;">
+                <img src="https://www.casspea.co.uk/static/images/logo-gray.png" alt="CassPea Logo" style="display: block; margin: 0 auto;">
+            </a>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Your Order has been Confirmed!</h1>
+            <p>Thank you for shopping with us. Your order is now being processed.</p>
+            <a href="https://new.casspea.co.uk/" class="button">View Your Order</a>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content">
+            <h2>Order Details</h2>
+            <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+            <p><strong>Order Date:</strong> {{ order.created|date:"F j, Y, g:i a" }}</p>
+
+            <div class="order-summary">
+                <table>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                    {% for item in order.checkout_session.cart.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.base_price }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <th colspan="2">Base Total</th>
+                        <td>${{ order.checkout_session.cart.base_total }}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Discount</th>
+                        <td>-${{ order.checkout_session.cart.total_savings }}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Shipping</th>
+                        <td>${{ order.checkout_session.shipping_cost }}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Total</th>
+                        <td>${{ order.checkout_session.total_with_shipping }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h2>Shipping Information</h2>
+            <p><strong>Shipping Address:</strong><br>
+            {{ order.shipping_address.street }}, {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code }}, {{ order.shipping_address.country }}</p>
+
+            <h2>Billing Information</h2>
+            <p><strong>Billing Address:</strong><br>
+            {{ order.billing_address.street }}, {{ order.billing_address.city }}, {{ order.billing_address.state }} {{ order.billing_address.zip_code }}, {{ order.billing_address.country }}</p>
+
+            <h2>Contact Information</h2>
+            <p><strong>Email:</strong> {{ order.email }}</p>
+            <p><strong>Phone:</strong> {{ order.checkout_session.phone }}</p>
+
+            <p>If you have any questions or need further assistance, feel free to reply to this email or contact our support team.</p>
+            <p>Best regards,<br>The CassPea Team</p>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p>&copy; {{ current_year }} CassPea. All rights reserved.</p>
+            <p>You are receiving this email because you made a purchase with us.</p>
+            <p><a href="https://new.casspea.co.uk/unsubscribe/">Unsubscribe</a></p>
+        </div>
+    </div>
+</body>
+</html>

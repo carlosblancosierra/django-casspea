@@ -67,7 +67,8 @@ INSTALLED_APPS = [
     'checkout',
     'orders',
     'shipping',
-
+    'mails',
+    'leads',
 
 ]
 
@@ -157,10 +158,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
     'https://main.d29kjbfnh50hd9.amplifyapp.com',
-    'https://casspea-v2.s3.eu-west-2.amazonaws.com',
     'https://casspea.co.uk',
     'https://www.casspea.co.uk',
     'https://www2.casspea.co.uk',
@@ -170,16 +168,12 @@ CORS_ALLOWED_ORIGINS = [
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
     'https://main.d29kjbfnh50hd9.amplifyapp.com',
-    'https://casspea-v2.s3.eu-west-2.amazonaws.com',
     'https://casspea.co.uk',
     'https://www.casspea.co.uk',
     'https://www2.casspea.co.uk',
     'https://api.casspea.co.uk',
     'https://new.casspea.co.uk',
-]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -355,3 +349,19 @@ SESSION_COOKIE_SECURE = True if not DEBUG else False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_SAVE_EVERY_REQUEST = True  # Important!
+
+# Email settings
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'info@casspea.co.uk'
+DEFAULT_FROM_EMAIL_NAME = 'CassPea'
+CONTACT_EMAIL = 'info@casspea.co.uk'
+SERVER_EMAIL = 'errors@casspea.co.uk'
+ADMINS = [('Carlos Blanco', 'carlosblancosierra@gmail.com')]
+STAFF_EMAILS = ['info@casspea.co.uk', 'sandy.gomezc@gmail.com','carlosblancosierra@gmail.com']
+
+# Site URL for tracking
+SITE_URL = 'https://casspea.co.uk'
