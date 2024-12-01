@@ -23,8 +23,12 @@ def stripe_webhook(request):
     logger.info("Received Stripe webhook", event_type="unknown")
 
     try:
+        webhook_secret = settings.STRIPE_WEBHOOK_SECRET
+        if not webhook_secret:
+            logger.error("STRIPE_WEBHOOK_SECRET is not set in settings")
+            return HttpResponse(status=500)
         event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            payload, sig_header, webhook_secret
         )
         logger.info("Stripe webhook constructed successfully", event_id=event.get('id'))
     except ValueError as ve:
