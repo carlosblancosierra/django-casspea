@@ -54,7 +54,6 @@ def stripe_webhook(request):
             checkout_session.payment_status = 'paid'
             checkout_session.stripe_payment_intent = session.get('payment_intent')
             checkout_session.stripe_session_id = session.get('id')
-            checkout_session.status = 'completed'
             checkout_session.save()
             logger.info("CheckoutSession updated", checkout_session_id=checkout_session_id)
 
