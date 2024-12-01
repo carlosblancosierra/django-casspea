@@ -18,7 +18,7 @@ logger = structlog.get_logger(__name__)
 @require_POST
 def stripe_webhook(request):
     payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
 
     logger.info("Received Stripe webhook", event_type="unknown")
 
