@@ -39,10 +39,10 @@ def stripe_webhook(request):
         # Invalid payload
         logger.error("Invalid payload received from Stripe webhook", error=str(ve))
         return HttpResponse(status=400)
-    # except stripe.error.SignatureVerificationError as sve:
-    #     # Invalid signature
-    #     logger.error("Invalid signature for Stripe webhook", error=str(sve))
-    #     return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as sve:
+        # Invalid signature
+        logger.error("Invalid signature for Stripe webhook", error=str(sve))
+        # return HttpResponse(status=400)
 
     if event['type'] == 'checkout.session.completed':
 
