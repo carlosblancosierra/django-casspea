@@ -15,7 +15,7 @@ services:
       - static_volume:/vol/web/static
       - media_volume:/vol/web/media
     env_file:
-      - ./.env.staging
+      - ./.env.prod
     networks:
       - django-casspea-net
 
