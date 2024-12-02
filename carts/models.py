@@ -46,6 +46,10 @@ class Cart(models.Model):
         return max(self.base_total - self.discount.amount, 0)
 
     @property
+    def total(self):
+        return self.discounted_total
+
+    @property
     def total_savings(self):
         """Calculate total amount saved due to discount"""
         return max(self.base_total - self.discounted_total, 0)

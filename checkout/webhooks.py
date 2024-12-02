@@ -137,7 +137,7 @@ def stripe_webhook(request):
                     email_sent.status = EmailSent.FAILED
                     email_sent.error_message = str(email_exc)
                     email_sent.save()
-                    logger.error("Failed to send order confirmation email", error=str(email_exc), email_sent_id=email_sent.id)
+                    logger.exception("Failed to send order confirmation email", error=str(email_exc), email_sent_id=email_sent.id)
             else:
                 logger.warning("No recipient email found for sending order confirmation", order_id=order.order_id)
 
@@ -145,7 +145,7 @@ def stripe_webhook(request):
             logger.error("CheckoutSession does not exist", checkout_session_id=checkout_session_id, error=str(csde))
             return HttpResponse(status=404)
         except Exception as e:
-            logger.error("Unexpected error during webhook processing", error=str(e))
+            logger.exception("Unexpected error during webhook processing", error=str(e))
             return HttpResponse(status=500)
 
     return HttpResponse(status=200)
