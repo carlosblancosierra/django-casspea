@@ -18,36 +18,46 @@ logger = structlog.get_logger(__name__)
 def stripe_webhook(request):
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    stripe.api_key = settings.STRIPE_SECRET_KEY
+    event = None
 
-    logger.info("Received Stripe webhook", event_type="unknown")
-
+    # Get the appropriate webhook secret based on environment
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
-    logger.info("endpoint_secret", endpoint_secret=endpoint_secret)
+
+    # Log the first few characters of the signature and secret for debugging
+    logger.info("Webhook Debug Info",
+        sig_header_preview=sig_header[:10] if sig_header else None,
+        endpoint_secret_preview=endpoint_secret[:10] if endpoint_secret else None,
+        payload_preview=payload[:100] if payload else None,
+        content_length=request.META.get('CONTENT_LENGTH'),
+        content_type=request.META.get('CONTENT_TYPE'),
+        request_method=request.method
+    )
 
     try:
-
-        if not endpoint_secret:
-            logger.error("endpoint_secret is not set in settings")
-            return HttpResponse(status=500)
-
         event = stripe.Webhook.construct_event(
             payload, sig_header, endpoint_secret
         )
-        logger.info("Stripe webhook constructed successfully", event_id=event.get('id'))
-    except ValueError as ve:
-        # Invalid payload
-        logger.error("Invalid payload received from Stripe webhook", error=str(ve))
+        logger.info("Stripe webhook constructed successfully",
+            event_id=event.get('id'),
+            event_type=event.get('type')
+        )
+    except ValueError as e:
+        logger.error("Invalid payload", error=str(e))
         return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as sve:
-        # Invalid signature
-        logger.error("Invalid signature for Stripe webhook", error=str(sve))
-        # return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        logger.error("Signature verification failed",
+            error=str(e),
+            sig_header=sig_header[:10],
+            endpoint_secret_preview=endpoint_secret[:10] if endpoint_secret else None,
+            full_sig_header=sig_header  # Log the full signature for debugging
+        )
+        return HttpResponse(status=400)
 
-    if event['type'] == 'checkout.session.completed':
-
+    if event and event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        logger.info("Processing checkout.session.completed event", session_id=session.get('id'))
+        logger.info("Processing checkout.session.completed event",
+            session_id=session.get('id')
+        )
 
         try:
             # Retrieve the CheckoutSession using metadata
