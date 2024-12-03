@@ -166,6 +166,12 @@ CORS_ALLOWED_ORIGINS = [
     'https://new.casspea.co.uk',
 ]
 
+# Allow localhost for CORS when in development
+if DEBUG:
+    CORS_ALLOWED_ORIGINS.append('http://localhost:3000')
+
+CORS_ALLOW_CREDENTIALS = True
+
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
     'https://main.d29kjbfnh50hd9.amplifyapp.com',
@@ -176,7 +182,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://new.casspea.co.uk',
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS.append('http://localhost:3000')
 
 # Add this at the bottom of settings.py
 AUTH_USER_MODEL = 'users.CustomUser'

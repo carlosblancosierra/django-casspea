@@ -27,7 +27,7 @@ class CheckoutViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Create or update checkout session",
-        description="Creates a new checkout session or returns existing one. Email required for guest checkout.",
+        description="Creates a new checkout session or returns existing one. Email is optional.",
         request=CheckoutDetailsSerializer,
         examples=[
             OpenApiExample(
@@ -73,7 +73,6 @@ class CheckoutViewSet(viewsets.ViewSet):
         )
 
         try:
-            # Get checkout session directly from request
             checkout_session = CheckoutSession.objects.get_or_create_from_request(request)
 
             with transaction.atomic():
@@ -83,7 +82,7 @@ class CheckoutViewSet(viewsets.ViewSet):
                     request_data=request.data
                 )
 
-                # Only handle email update
+                # Update email if provided in request data, even if empty
                 if 'email' in request.data and not request.user.is_authenticated:
                     checkout_session.email = request.data['email']
                     checkout_session.save()
@@ -277,4 +276,50 @@ class CheckoutViewSet(viewsets.ViewSet):
             return Response(
                 {'error': 'Checkout session not found'},
                 status=status.HTTP_404_NOT_FOUND
+            )
+
+    @extend_schema(
+        summary="Get current checkout session",
+        description="Retrieves the current checkout session for the user or creates a new one",
+        responses={
+            200: CheckoutSessionSerializer,
+            500: OpenApiTypes.OBJECT
+        }
+    )
+    def list(self, request):
+        """
+        Get current checkout session
+        GET /api/checkout/session/
+        """
+        logger.info(
+            "checkout_session_requested",
+            user_id=getattr(request.user, 'id', None),
+            session_id=request.session.session_key
+        )
+
+        try:
+            checkout_session = CheckoutSession.objects.get_or_create_from_request(request)
+
+            logger.info(
+                "checkout_session_retrieved",
+                checkout_session_id=checkout_session.id,
+                cart_id=checkout_session.cart.id if checkout_session.cart else None
+            )
+
+            return Response(
+                CheckoutSessionSerializer(checkout_session).data,
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            logger.error(
+                "checkout_session_error",
+                error=str(e),
+                error_type=type(e).__name__,
+                user_id=getattr(request.user, 'id', None),
+                exc_info=True
+            )
+            return Response(
+                {'error': 'Failed to retrieve checkout session'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
