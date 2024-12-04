@@ -3,17 +3,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
-from carts.models import Cart
 from checkout.models import CheckoutSession
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 from .serializers import CheckoutSessionSerializer, CheckoutDetailsSerializer
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-import stripe
-from django.conf import settings
-from orders.models import Order
 from shipping.models import ShippingOption
 import structlog
 
@@ -27,7 +22,7 @@ class CheckoutViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Create or update checkout session",
-        description="Creates a new checkout session or returns existing one. Email is optional.",
+        description="Creates a new checkout session or returns existing one. Email and shipping option are optional.",
         request=CheckoutDetailsSerializer,
         examples=[
             OpenApiExample(
@@ -35,7 +30,8 @@ class CheckoutViewSet(viewsets.ViewSet):
                 summary="Create checkout session for guest user",
                 description="Example of creating a checkout session",
                 value={
-                    "email": "carlosblancosierra@gmail.com"
+                    "email": "carlosblancosierra@gmail.com",
+                    "shipping_option_id": 3
                 },
                 request_only=True,
             ),
@@ -86,6 +82,23 @@ class CheckoutViewSet(viewsets.ViewSet):
                 if 'email' in request.data and not request.user.is_authenticated:
                     checkout_session.email = request.data['email']
                     checkout_session.save()
+
+                # Update shipping option if provided
+                shipping_option_id = request.data.get('shipping_option_id')
+                if shipping_option_id:
+                    try:
+                        shipping_option = ShippingOption.objects.get(
+                            id=shipping_option_id,
+                            active=True,
+                            company__active=True
+                        )
+                        checkout_session.shipping_option = shipping_option
+                        checkout_session.save()
+                    except ShippingOption.DoesNotExist:
+                        return Response(
+                            {'error': 'Invalid shipping option'},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
 
                 logger.info(
                     "checkout_created_successfully",
@@ -155,84 +168,6 @@ class CheckoutViewSet(viewsets.ViewSet):
                 {'error': 'Checkout session not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-    @extend_schema(
-        summary="Process Stripe webhook",
-        description="Handles Stripe webhook events for payment processing",
-        responses={
-            200: OpenApiTypes.OBJECT,
-            400: OpenApiTypes.OBJECT,
-            500: OpenApiTypes.OBJECT
-        }
-    )
-    @method_decorator(csrf_exempt)
-    @action(detail=False, methods=['post'], url_path='webhook')
-    def webhook(self, request):
-        payload = request.body
-        sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
-
-        logger.info(
-            "webhook_received",
-            sig_header=sig_header is not None,
-            payload_size=len(payload) if payload else 0
-        )
-
-        try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
-            )
-
-            logger.info(
-                "stripe_webhook_event",
-                event_type=event.type,
-                event_id=event.id
-            )
-
-            if event.type == 'checkout.session.completed':
-                session = event.data.object
-
-                # Get checkout session from metadata
-                checkout_session = CheckoutSession.objects.get(
-                    stripe_session_id=session.id
-                )
-
-                # Update checkout session status
-                checkout_session.payment_status = CheckoutSession.PAYMENT_STATUS_PAID
-                checkout_session.stripe_payment_intent = session.payment_intent
-                checkout_session.save()
-
-                # Mark cart as inactive
-                cart = checkout_session.cart
-                cart.active = False
-                cart.save()
-
-                # Create order (implement this in your Order model)
-                order = Order.objects.create_from_checkout(checkout_session)
-
-                logger.info(
-                    "payment_processed_successfully",
-                    checkout_session_id=checkout_session.id,
-                    order_id=order.order_id,
-                    stripe_session_id=session.id
-                )
-
-            # Log the full event data for testing
-            logger.debug(
-                "webhook_data",
-                event_data=event.data
-            )
-
-            return HttpResponse(status=200)
-
-        except ValueError as e:
-            logger.error("Invalid payload", error=str(e))
-            return HttpResponse(status=400)
-        except stripe.error.SignatureVerificationError as e:
-            logger.error("Invalid signature", error=str(e))
-            return HttpResponse(status=400)
-        except Exception as e:
-            logger.error("Webhook error", error=str(e), exc_info=True)
-            return HttpResponse(status=500)
 
     @extend_schema(
         summary="Update shipping option",
@@ -323,3 +258,81 @@ class CheckoutViewSet(viewsets.ViewSet):
                 {'error': 'Failed to retrieve checkout session'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+    @extend_schema(
+        summary="Process Stripe webhook",
+        description="Handles Stripe webhook events for payment processing",
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT
+        }
+    )
+    @method_decorator(csrf_exempt)
+    @action(detail=False, methods=['post'], url_path='webhook')
+    def webhook(self, request):
+        payload = request.body
+        sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+
+        logger.info(
+            "webhook_received",
+            sig_header=sig_header is not None,
+            payload_size=len(payload) if payload else 0
+        )
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            )
+
+            logger.info(
+                "stripe_webhook_event",
+                event_type=event.type,
+                event_id=event.id
+            )
+
+            if event.type == 'checkout.session.completed':
+                session = event.data.object
+
+                # Get checkout session from metadata
+                checkout_session = CheckoutSession.objects.get(
+                    stripe_session_id=session.id
+                )
+
+                # Update checkout session status
+                checkout_session.payment_status = CheckoutSession.PAYMENT_STATUS_PAID
+                checkout_session.stripe_payment_intent = session.payment_intent
+                checkout_session.save()
+
+                # Mark cart as inactive
+                cart = checkout_session.cart
+                cart.active = False
+                cart.save()
+
+                # Create order (implement this in your Order model)
+                order = Order.objects.create_from_checkout(checkout_session)
+
+                logger.info(
+                    "payment_processed_successfully",
+                    checkout_session_id=checkout_session.id,
+                    order_id=order.order_id,
+                    stripe_session_id=session.id
+                )
+
+            # Log the full event data for testing
+            logger.debug(
+                "webhook_data",
+                event_data=event.data
+            )
+
+            return HttpResponse(status=200)
+
+        except ValueError as e:
+            logger.error("Invalid payload", error=str(e))
+            return HttpResponse(status=400)
+        except stripe.error.SignatureVerificationError as e:
+            logger.error("Invalid signature", error=str(e))
+            return HttpResponse(status=400)
+        except Exception as e:
+            logger.error("Webhook error", error=str(e), exc_info=True)
+            return HttpResponse(status=500)

@@ -150,7 +150,7 @@ class StripeCheckoutSessionView(APIView):
             }
 
             PROTOCOL = "https"
-            API_DOMAIN = "new.casspea.co.uk"
+            API_DOMAIN = "api.casspea.co.uk"
             FULL_API_DOMAIN = f"{PROTOCOL}://{API_DOMAIN}"
 
             # Discount handling
@@ -233,3 +233,29 @@ class StripeCheckoutSessionView(APIView):
                 {"error": "An unexpected error occurred"},
                 status=500
             )
+
+class StripeSuccessView(APIView):
+    """
+    Handles the success URL redirection after a successful Stripe checkout.
+    """
+    @extend_schema(
+        summary="Stripe Checkout Success",
+        description="Redirects to the frontend cart page after a successful checkout.",
+        responses={302: OpenApiResponse(description="Redirect to frontend cart")}
+    )
+    def get(self, request, *args, **kwargs):
+        logger.info("stripe_checkout_success", session_id=request.GET.get('session_id'))
+        return redirect('https://new.casspea.co.uk/cart')
+
+class StripeCancelView(APIView):
+    """
+    Handles the cancel URL redirection after a cancelled Stripe checkout.
+    """
+    @extend_schema(
+        summary="Stripe Checkout Cancel",
+        description="Redirects to the frontend cart page after a cancelled checkout.",
+        responses={302: OpenApiResponse(description="Redirect to frontend cart")}
+    )
+    def get(self, request, *args, **kwargs):
+        logger.info("stripe_checkout_cancel", session_id=request.GET.get('session_id'))
+        return redirect('https://new.casspea.co.uk/cart')
