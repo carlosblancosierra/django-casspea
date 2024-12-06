@@ -124,19 +124,6 @@ class StripeCheckoutSessionView(APIView):
                 total_items=sum(item.quantity for item in cart_items)
             )
 
-            # Shipping options
-            shipping_options = [{
-                "shipping_rate_data": {
-                    "type": "fixed_amount",
-                    "fixed_amount": {"amount": 0, "currency": "gbp"},
-                    "display_name": "Free shipping",
-                    "delivery_estimate": {
-                        "minimum": {"unit": "business_day", "value": 3},
-                        "maximum": {"unit": "business_day", "value": 5},
-                    },
-                },
-            }]
-
             # Invoice configuration
             invoice_creation = {
                 "enabled": True,
@@ -168,7 +155,7 @@ class StripeCheckoutSessionView(APIView):
                 currency='GBP',
                 mode='payment',
                 discounts=discounts,
-                shipping_options=shipping_options,
+                shipping_options=checkout_session.shipping_stripe_format,
                 client_reference_id=str(checkout_session.id),
                 success_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/success?session_id={checkout_session.id}",
                 cancel_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/cancel?session_id={checkout_session.id}",

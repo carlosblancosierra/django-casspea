@@ -84,3 +84,27 @@ class CheckoutSession(models.Model):
     @property
     def total_with_shipping(self):
         return float(self.cart.total) + float(self.shipping_cost)
+
+    @property
+    def shipping_stripe_format(self):
+        if not self.shipping_option:
+            return None
+
+        amount = self.shipping_cost
+        display_name = self.shipping_option.name
+        min_days = self.shipping_option.estimated_days_min
+        max_days = self.shipping_option.estimated_days_max
+
+        return {
+            "shipping_rate_data": {
+                "type": "fixed_amount",
+                "fixed_amount": {"amount": amount, "currency": "gbp"},
+                "display_name": display_name,
+                "delivery_estimate": {
+                    "minimum": {"unit": "business_day", "value": min_days},
+                    "maximum": {"unit": "business_day", "value": max_days},
+                },
+            },
+        }
+
+

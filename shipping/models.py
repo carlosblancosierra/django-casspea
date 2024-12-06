@@ -19,6 +19,7 @@ class ShippingCompany(models.Model):
 
 
 class ShippingOption(models.Model):
+    
 
     company = models.ForeignKey(
         ShippingCompany,
