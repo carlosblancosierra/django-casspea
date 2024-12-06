@@ -35,7 +35,9 @@ class ShippingOption(models.Model):
         validators=[MinValueValidator(0)]
     )
     cents = models.PositiveIntegerField(
-        validators=[MinValueValidator(0)]
+        null=True,
+        blank=True,
+        default=499
     )
     estimated_days_min = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(30)]
