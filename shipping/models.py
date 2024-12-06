@@ -19,7 +19,7 @@ class ShippingCompany(models.Model):
 
 
 class ShippingOption(models.Model):
-    
+
 
     company = models.ForeignKey(
         ShippingCompany,
@@ -32,6 +32,9 @@ class ShippingOption(models.Model):
     price = models.DecimalField(
         max_digits=6,
         decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+    cents = models.PositiveIntegerField(
         validators=[MinValueValidator(0)]
     )
     estimated_days_min = models.PositiveSmallIntegerField(

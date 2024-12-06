@@ -79,7 +79,7 @@ class CheckoutSession(models.Model):
             self.cart.base_total >= 45):
             return 0
 
-        return self.shipping_option.price
+        return self.shipping_option.cents
 
     @property
     def total_with_shipping(self):
