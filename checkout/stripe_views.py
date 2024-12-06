@@ -145,7 +145,11 @@ class StripeCheckoutSessionView(APIView):
             if checkout_session.cart.discount and checkout_session.cart.discount.status[0]:
                 discounts = [{'coupon': checkout_session.cart.discount.stripe_id}]
 
-
+            logger.info(
+                "shipping_stripe_format",
+                checkout_session_id=checkout_session.id,
+                shipping_stripe_format=checkout_session.shipping_stripe_format
+            )
 
             # Create Stripe checkout session
             stripe_session = stripe.checkout.Session.create(
