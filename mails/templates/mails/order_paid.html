@@ -192,10 +192,12 @@
                         <th colspan="2">Base Total</th>
                         <td>${{ order.checkout_session.cart.base_total }}</td>
                     </tr>
-                    <tr>
-                        <th colspan="2">Discount</th>
-                        <td>-${{ order.checkout_session.cart.total_savings }}</td>
-                    </tr>
+                    {% if order.checkout_session.cart.total_savings > 0 %}
+                        <tr>
+                            <th colspan="2">Discount</th>
+                            <td>-${{ order.checkout_session.cart.total_savings }}</td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <th colspan="2">Shipping</th>
                         <td>${{ order.checkout_session.shipping_cost }}</td>

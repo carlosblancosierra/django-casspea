@@ -85,6 +85,9 @@ ssh -i $KEY_PATH $EC2_USER@$EC2_IP << EOF
     echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: Logging into AWS ECR on EC2..."
     aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REGISTRY_URL
 
+    echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: Resetting local changes..."
+    git reset --hard
+
     echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: Pulling latest changes from main branch..."
     git pull origin main
 

@@ -82,8 +82,14 @@ class CheckoutSession(models.Model):
         return self.shipping_option.cents
 
     @property
+    def shipping_cost_float(self):
+        if not self.shipping_cost:
+            return 0
+        return float(self.shipping_cost / 100)
+
+    @property
     def total_with_shipping(self):
-        return float(self.cart.total) + float(self.shipping_cost)
+        return float(self.cart.total) + float(self.shipping_cost_float)
 
     @property
     def shipping_stripe_format(self):

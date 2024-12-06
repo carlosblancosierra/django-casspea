@@ -3,6 +3,7 @@ from django.conf import settings
 from products.models import Product, Allergen
 from flavours.models import Flavour
 from discounts.models import Discount
+from decimal import Decimal, ROUND_UP
 
 from .managers import CartManager
 
@@ -51,8 +52,9 @@ class Cart(models.Model):
 
     @property
     def total_savings(self):
-        """Calculate total amount saved due to discount"""
-        return max(self.base_total - self.discounted_total, 0)
+        """Calculate total amount saved due to discount, rounded up to 2 decimal places"""
+        savings = max(self.base_total - self.discounted_total, 0)
+        return Decimal(savings).quantize(Decimal('0.01'), rounding=ROUND_UP)
 
     @property
     def is_discount_valid(self):
