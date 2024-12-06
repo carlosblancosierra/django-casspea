@@ -33,9 +33,10 @@ class CheckoutSessionManager(models.Manager):
                 cart_active=cart.active
             )
 
-            # Check for existing sessions
+            # Check for non-paid sessions
             existing_sessions = self.filter(
                 cart=cart,
+                payment_status=self.model.PAYMENT_STATUS_PENDING
             ).select_related('cart')
 
             logger.debug(

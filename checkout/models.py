@@ -9,9 +9,9 @@ from .managers import CheckoutSessionManager
 
 # Create your models here.
 class CheckoutSession(models.Model):
-    PAYMENT_STATUS_PENDING = 'PENDING'
-    PAYMENT_STATUS_PAID = 'PAID'
-    PAYMENT_STATUS_FAILED = 'FAILED'
+    PAYMENT_STATUS_PENDING = 'pending'
+    PAYMENT_STATUS_PAID = 'paid'
+    PAYMENT_STATUS_FAILED = 'failed'
 
     PAYMENT_STATUS_CHOICES = [
         (PAYMENT_STATUS_PENDING, 'Pending'),
@@ -45,7 +45,7 @@ class CheckoutSession(models.Model):
     payment_status = models.CharField(
         max_length=20,
         choices=PAYMENT_STATUS_CHOICES,
-        default='pending'
+        default=PAYMENT_STATUS_PENDING
     )
     stripe_payment_intent = models.CharField(max_length=255, null=True, blank=True)
     stripe_session_id = models.CharField(max_length=255, null=True, blank=True)
