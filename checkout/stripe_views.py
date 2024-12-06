@@ -151,6 +151,8 @@ class StripeCheckoutSessionView(APIView):
                 shipping_stripe_format=checkout_session.shipping_stripe_format
             )
 
+            shipping_options = [checkout_session.shipping_stripe_format]
+
             # Create Stripe checkout session
             stripe_session = stripe.checkout.Session.create(
                 payment_method_types=['card', 'klarna'],
@@ -159,7 +161,7 @@ class StripeCheckoutSessionView(APIView):
                 currency='GBP',
                 mode='payment',
                 discounts=discounts,
-                shipping_options=checkout_session.shipping_stripe_format,
+                shipping_options=shipping_options,
                 client_reference_id=str(checkout_session.id),
                 success_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/success?session_id={checkout_session.id}",
                 cancel_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/cancel?session_id={checkout_session.id}",
