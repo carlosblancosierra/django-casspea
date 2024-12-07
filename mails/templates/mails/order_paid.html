@@ -183,26 +183,26 @@
                     {% for item in order.checkout_session.cart.items.all %}
                     <tr>
                         <td>{{ item.quantity }}x {{ item.product.name }}</td>
-                        <td>${{ item.base_price }}</td>
+                        <td>£{{ item.base_price }}</td>
                     </tr>
                     {% endfor %}
                     <tr>
                         <th colspan="2">Base Total</th>
-                        <td>${{ order.checkout_session.cart.base_total }}</td>
+                        <td>£{{ order.checkout_session.cart.base_total }}</td>
                     </tr>
                     {% if order.checkout_session.cart.total_savings > 0 %}
                         <tr>
                             <th colspan="2">Discount</th>
-                            <td>-${{ order.checkout_session.cart.total_savings }}</td>
+                            <td>-£{{ order.checkout_session.cart.total_savings }}</td>
                         </tr>
                     {% endif %}
                     <tr>
                         <th colspan="2">Shipping</th>
-                        <td>${{ order.checkout_session.shipping_cost_pounds }}</td>
+                        <td>£{{ order.checkout_session.shipping_cost_pounds }}</td>
                     </tr>
                     <tr>
                         <th colspan="2">Total</th>
-                        <td>${{ order.checkout_session.total_with_shipping }}</td>
+                        <td>£{{ order.checkout_session.total_with_shipping }}</td>
                     </tr>
                 </table>
             </div>
