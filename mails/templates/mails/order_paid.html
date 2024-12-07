@@ -178,13 +178,11 @@
                 <table>
                     <tr>
                         <th>Item</th>
-                        <th>Quantity</th>
                         <th>Price</th>
                     </tr>
                     {% for item in order.checkout_session.cart.items.all %}
                     <tr>
-                        <td>{{ item.product.name }}</td>
-                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.quantity }}x {{ item.product.name }}</td>
                         <td>${{ item.base_price }}</td>
                     </tr>
                     {% endfor %}
@@ -200,7 +198,7 @@
                     {% endif %}
                     <tr>
                         <th colspan="2">Shipping</th>
-                        <td>${{ order.checkout_session.shipping_cost }}</td>
+                        <td>${{ order.checkout_session.shipping_cost_pounds }}</td>
                     </tr>
                     <tr>
                         <th colspan="2">Total</th>

@@ -2,12 +2,18 @@ from django.db import models
 from django.conf import settings
 
 class Address(models.Model):
-    SHIPPING_ADDRESS = 'SHIPPING'
-    BILLING_ADDRESS = 'BILLING'
+    """
+    Represents an address for a user.
+    """
+
+    # Address types
+    class AddressType(models.TextChoices):
+        SHIPPING_ADDRESS = 'SHIPPING'
+        BILLING_ADDRESS = 'BILLING'
 
     ADDRESS_TYPE_CHOICES = [
-        (SHIPPING_ADDRESS, 'Shipping Address'),
-        (BILLING_ADDRESS, 'Billing Address'),
+        (AddressType.SHIPPING_ADDRESS, 'Shipping Address'),
+        (AddressType.BILLING_ADDRESS, 'Billing Address'),
     ]
 
     user = models.ForeignKey(
@@ -23,7 +29,9 @@ class Address(models.Model):
     )
 
     # Address fields
-    full_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
     phone = models.CharField(max_length=20)
     street_address = models.CharField(max_length=255)
     street_address2 = models.CharField(max_length=255, blank=True)

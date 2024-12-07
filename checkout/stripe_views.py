@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from django.shortcuts import redirect
 from django.conf import settings
-from django.urls import reverse
 from checkout.models import CheckoutSession
 from rest_framework.exceptions import ValidationError
+from carts.models import Cart
+from django.core.mail import send_mail
 
 import stripe
 import structlog
@@ -66,7 +67,7 @@ class StripeCheckoutSessionView(APIView):
     )
     def post(self, request, *args, **kwargs):
         try:
-            # Get the session checkout
+            # Get or create the checkout session from the request
             checkout_session = CheckoutSession.objects.get_or_create_from_request(request)
 
             logger.info(
@@ -75,10 +76,11 @@ class StripeCheckoutSessionView(APIView):
                 cart_id=checkout_session.cart.id if checkout_session.cart else None
             )
 
+            # Validate shipping address
             if not checkout_session.shipping_address:
                 raise ValidationError("Shipping address is required")
 
-            # Get cart items using the related name
+            # Retrieve cart items
             cart_items = checkout_session.cart.items.select_related('product').all()
 
             logger.debug(
@@ -96,7 +98,7 @@ class StripeCheckoutSessionView(APIView):
             if not cart_items.exists():
                 raise ValidationError("Cart is empty")
 
-            # Create line items from cart entries
+            # Create line items for Stripe
             line_items = []
             for item in cart_items:
                 if not item.product.stripe_price_id:
@@ -124,7 +126,7 @@ class StripeCheckoutSessionView(APIView):
                 total_items=sum(item.quantity for item in cart_items)
             )
 
-            # Invoice configuration
+            # Configure invoice creation
             invoice_creation = {
                 "enabled": True,
                 "invoice_data": {
@@ -138,9 +140,11 @@ class StripeCheckoutSessionView(APIView):
 
             PROTOCOL = "https"
             API_DOMAIN = "api.casspea.co.uk"
+            FRONTEND_DOMAIN = "new.casspea.co.uk"
             FULL_API_DOMAIN = f"{PROTOCOL}://{API_DOMAIN}"
+            FULL_FRONTEND_DOMAIN = f"{PROTOCOL}://{FRONTEND_DOMAIN}"
 
-            # Discount handling
+            # Handle discounts
             discounts = []
             if checkout_session.cart.discount and checkout_session.cart.discount.status[0]:
                 discounts = [{'coupon': checkout_session.cart.discount.stripe_id}]
@@ -163,8 +167,8 @@ class StripeCheckoutSessionView(APIView):
                 discounts=discounts,
                 shipping_options=shipping_options,
                 client_reference_id=str(checkout_session.id),
-                success_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/success?session_id={checkout_session.id}",
-                cancel_url=f"{FULL_API_DOMAIN}/api/checkout/stripe/cancel?session_id={checkout_session.id}",
+                success_url=f"{FULL_FRONTEND_DOMAIN}/checkout/success?session_id={checkout_session.id}",
+                cancel_url=f"{FULL_FRONTEND_DOMAIN}/checkout/cancel?session_id={checkout_session.id}",
                 invoice_creation=invoice_creation,
                 custom_text={
                     'submit': {
@@ -177,6 +181,7 @@ class StripeCheckoutSessionView(APIView):
                 expires_at=int((timezone.now() + timedelta(minutes=30)).timestamp())
             )
 
+            # Save Stripe session ID to CheckoutSession
             checkout_session.stripe_session_id = stripe_session.id
             checkout_session.save()
 
@@ -237,8 +242,23 @@ class StripeSuccessView(APIView):
         responses={302: OpenApiResponse(description="Redirect to frontend cart")}
     )
     def get(self, request, *args, **kwargs):
-        logger.info("stripe_checkout_success", session_id=request.GET.get('session_id'))
-        return redirect('https://new.casspea.co.uk/cart')
+        session_id = request.GET.get('session_id')
+        if not session_id:
+            logger.error("Missing session_id in request")
+            return redirect(f'https://new.casspea.co.uk/checkout/error?session_id={session_id}')
+
+        try:
+            # Verify the session with Stripe
+            session = stripe.checkout.Session.retrieve(session_id)
+            if session.payment_status == 'paid':
+                logger.info("stripe_checkout_success", session_id=session_id)
+                return redirect(f'https://new.casspea.co.uk/checkout/success?session_id={session_id}')
+            else:
+                logger.warning("Payment not completed for session", session_id=session_id)
+                return redirect(f'https://new.casspea.co.uk/checkout/error?session_id={session_id}')
+        except stripe.error.StripeError as e:
+            logger.error("Stripe API error", error=str(e))
+            return redirect(f'https://new.casspea.co.uk/checkout/error?session_id={session_id}')
 
 class StripeCancelView(APIView):
     """
@@ -246,9 +266,14 @@ class StripeCancelView(APIView):
     """
     @extend_schema(
         summary="Stripe Checkout Cancel",
-        description="Redirects to the frontend cart page after a cancelled checkout.",
-        responses={302: OpenApiResponse(description="Redirect to frontend cart")}
+        description="Redirects to the frontend checkout error page after a cancelled checkout.",
+        responses={302: OpenApiResponse(description="Redirect to frontend checkout error")}
     )
     def get(self, request, *args, **kwargs):
-        logger.info("stripe_checkout_cancel", session_id=request.GET.get('session_id'))
-        return redirect('https://new.casspea.co.uk/cart')
+        session_id = request.GET.get('session_id')
+        if session_id:
+            logger.info("stripe_checkout_cancel", session_id=session_id)
+        else:
+            logger.error("Missing session_id in request")
+
+        return redirect(f'https://new.casspea.co.uk/checkout/error?session_id={session_id}')

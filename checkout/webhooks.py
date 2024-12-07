@@ -66,7 +66,7 @@ def stripe_webhook(request):
             logger.info("CheckoutSession retrieved", checkout_session_id=checkout_session_id)
 
             # Update CheckoutSession status
-            checkout_session.payment_status = CheckoutSession.PAYMENT_STATUS_PAID
+            checkout_session.payment_status = CheckoutSession.Status.PAID
             checkout_session.stripe_payment_intent = session.get('payment_intent')
             checkout_session.stripe_session_id = session.get('id')
             checkout_session.save()
@@ -146,6 +146,30 @@ def stripe_webhook(request):
             return HttpResponse(status=404)
         except Exception as e:
             logger.exception("Unexpected error during webhook processing", error=str(e))
+            return HttpResponse(status=500)
+
+    if event and event['type'] == 'payment_intent.payment_failed':
+        session = event['data']['object']
+        logger.info("Processing payment_intent.payment_failed event",
+            session_id=session.get('id')
+        )
+
+        try:
+            # Retrieve the CheckoutSession using metadata
+            checkout_session_id = session['metadata'].get('checkout_session_id')
+            checkout_session = CheckoutSession.objects.get(id=checkout_session_id)
+            logger.info("CheckoutSession retrieved for failed payment", checkout_session_id=checkout_session_id)
+
+            # Update CheckoutSession status
+            checkout_session.payment_status = CheckoutSession.Status.FAILED
+            checkout_session.save()
+            logger.info("CheckoutSession updated to FAILED", checkout_session_id=checkout_session_id)
+
+        except CheckoutSession.DoesNotExist as csde:
+            logger.error("CheckoutSession does not exist for failed payment", checkout_session_id=checkout_session_id, error=str(csde))
+            return HttpResponse(status=404)
+        except Exception as e:
+            logger.exception("Unexpected error during payment failure processing", error=str(e))
             return HttpResponse(status=500)
 
     return HttpResponse(status=200)

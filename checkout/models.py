@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from decimal import Decimal, ROUND_HALF_UP, ROUND_UP
 
 User = get_user_model()
 from addresses.models import Address
@@ -9,14 +10,17 @@ from .managers import CheckoutSessionManager
 
 # Create your models here.
 class CheckoutSession(models.Model):
-    PAYMENT_STATUS_PENDING = 'pending'
-    PAYMENT_STATUS_PAID = 'paid'
-    PAYMENT_STATUS_FAILED = 'failed'
+    class Status(models.TextChoices):
+        PENDING = 'pending'
+        PAID = 'paid'
+        FAILED = 'failed'
+        CANCELLED = 'cancelled'
 
-    PAYMENT_STATUS_CHOICES = [
-        (PAYMENT_STATUS_PENDING, 'Pending'),
-        (PAYMENT_STATUS_PAID, 'Paid'),
-        (PAYMENT_STATUS_FAILED, 'Failed'),
+    payment_status_choices = [
+        (Status.PENDING, 'Pending'),
+        (Status.PAID, 'Paid'),
+        (Status.FAILED, 'Failed'),
+        (Status.CANCELLED, 'Cancelled'),
     ]
 
     cart = models.ForeignKey('carts.Cart', on_delete=models.CASCADE)
@@ -44,8 +48,8 @@ class CheckoutSession(models.Model):
 
     payment_status = models.CharField(
         max_length=20,
-        choices=PAYMENT_STATUS_CHOICES,
-        default=PAYMENT_STATUS_PENDING
+        choices=payment_status_choices,
+        default=Status.PENDING
     )
     stripe_payment_intent = models.CharField(max_length=255, null=True, blank=True)
     stripe_session_id = models.CharField(max_length=255, null=True, blank=True)
@@ -82,14 +86,23 @@ class CheckoutSession(models.Model):
         return self.shipping_option.cents
 
     @property
-    def shipping_cost_float(self):
-        if not self.shipping_cost:
-            return 0
-        return float(self.shipping_cost / 100)
+    def shipping_cost_pounds(self):
+        """Return the shipping cost in pounds, rounded to two decimal places."""
+        shipping_cost = self.shipping_cost or 0
+        shipping_cost_decimal = Decimal(shipping_cost) / Decimal('100.00')
+        return shipping_cost_decimal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     @property
     def total_with_shipping(self):
-        return float(self.cart.total) + float(self.shipping_cost_float)
+        # Ensure that both cart.total and shipping_cost_pounds are Decimals
+        cart_total = Decimal(self.cart.total)
+        shipping = self.shipping_cost_pounds
+
+        # Calculate the total
+        total = cart_total + shipping
+
+        # Round up to two decimal places
+        return total.quantize(Decimal('0.01'), rounding=ROUND_UP)
 
     @property
     def shipping_stripe_format(self):
