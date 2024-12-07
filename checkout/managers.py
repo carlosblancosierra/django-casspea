@@ -36,7 +36,7 @@ class CheckoutSessionManager(models.Manager):
             # Check for non-paid sessions
             existing_sessions = self.filter(
                 cart=cart,
-                payment_status=self.model.PAYMENT_STATUS_PENDING
+                payment_status=self.model.Status.PENDING
             ).select_related('cart')
 
             logger.debug(
@@ -120,7 +120,7 @@ class CheckoutSessionManager(models.Manager):
             if not session.cart.items.exists():
                 raise ValidationError("Cart is empty")
 
-            if session.payment_status != self.model.PAYMENT_STATUS_PENDING:
+            if session.payment_status != self.model.Status.PENDING:
                 raise ValidationError("Session is not in pending status")
 
             logger.info(
