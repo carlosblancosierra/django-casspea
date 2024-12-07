@@ -253,3 +253,10 @@ class CartUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"discount_code": f"An unexpected error occurred: {str(e)}"})
 
         return super().update(instance, validated_data)
+
+class CartItemQuantityUpdateSerializer(serializers.ModelSerializer):
+    quantity = serializers.IntegerField(min_value=1)
+
+    class Meta:
+        model = CartItem
+        fields = ['quantity']

@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Cart, CartItem, Product
-from .serializers import CartSerializer, CartItemCreateSerializer, CartUpdateSerializer
+from .serializers import CartSerializer, CartItemCreateSerializer, CartUpdateSerializer, CartItemQuantityUpdateSerializer
 from products.models import Product
 import logging
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, inline_serializer
@@ -10,6 +10,8 @@ from drf_spectacular.types import OpenApiTypes
 from discounts.models import Discount
 from rest_framework import serializers
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
 
 logger = logging.getLogger(__name__)
 
@@ -247,3 +249,42 @@ class CartItemViewSet(viewsets.ViewSet):
         cart_item.delete()
         cart.refresh_from_db()
         return Response(CartSerializer(cart).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['delete'], url_path='remove', url_name='remove')
+    @extend_schema(
+        summary="Remove cart item",
+        responses={200: CartSerializer},
+        description="Removes a specific item from the cart."
+    )
+    def remove(self, request, pk=None):
+        """
+        Remove a cart item from the cart.
+        """
+        cart, _ = Cart.objects.get_or_create_from_request(request)
+        cart_item = get_object_or_404(CartItem, pk=pk, cart=cart)
+        cart_item.delete()
+        cart.refresh_from_db()
+        serializer = CartSerializer(cart)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['patch'], url_path='change-quantity', url_name='change_quantity')
+    @extend_schema(
+        summary="Change quantity of a cart item",
+        request=CartItemQuantityUpdateSerializer,
+        responses={200: CartSerializer},
+        description="Updates the quantity of a specific cart item."
+    )
+    def change_quantity(self, request, pk=None):
+        """
+        Change the quantity of a cart item.
+        """
+        cart, _ = Cart.objects.get_or_create_from_request(request)
+        cart_item = get_object_or_404(CartItem, pk=pk, cart=cart)
+        serializer = CartItemQuantityUpdateSerializer(cart_item, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            cart.refresh_from_db()
+            return Response(CartSerializer(cart).data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
