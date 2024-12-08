@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from allergens.models import Allergen
 from django.utils.text import slugify
 from storages.backends.s3boto3 import S3Boto3Storage
@@ -186,3 +186,155 @@ class Product(models.Model):
         if self.thumbnail_webp:
             self.thumbnail_webp.delete()
         super().delete(*args, **kwargs)
+
+class ProductGalleryImage(models.Model):
+    product = models.ForeignKey(
+        Product,
+        related_name='gallery_images',
+        on_delete=models.CASCADE
+    )
+    image = models.ImageField(
+        upload_to='products/gallery/%Y/%m/',
+        storage=s3_storage,
+        help_text="Gallery image"
+    )
+    image_webp = models.ImageField(
+        upload_to='products/gallery/%Y/%m/',
+        storage=s3_storage,
+        help_text="WebP version of gallery image",
+        blank=True,
+        null=True
+    )
+    thumbnail = models.ImageField(
+        upload_to='products/gallery/thumbnails/%Y/%m/',
+        storage=s3_storage,
+        help_text="Thumbnail image (JPEG)",
+        blank=True,
+        null=True
+    )
+    thumbnail_webp = models.ImageField(
+        upload_to='products/gallery/thumbnails/%Y/%m/',
+        storage=s3_storage,
+        help_text="Thumbnail image (WebP)",
+        blank=True,
+        null=True
+    )
+    alt_text = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Alternative text for image"
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Order of images in gallery"
+    )
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'created']
+        unique_together = ['product', 'order']
+
+    def create_webp_version(self, image_field, webp_field, is_thumbnail=False):
+        """Create WebP version of the image"""
+        if not image_field:
+            return
+
+        img = Image.open(image_field)
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+
+        if is_thumbnail:
+            img.thumbnail((300, 300))
+
+        webp_io = BytesIO()
+        img.save(webp_io, 'WEBP', quality=85, optimize=True)
+        webp_io.seek(0)
+
+        original_name = os.path.splitext(image_field.name)[0]
+        webp_filename = f"{original_name}.webp"
+
+        webp_field.save(
+            webp_filename,
+            ContentFile(webp_io.getvalue()),
+            save=False
+        )
+
+    def create_thumbnail(self, image_field, thumbnail_field):
+        """Create thumbnail version of the image"""
+        if not image_field:
+            return
+
+        img = Image.open(image_field)
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+
+        img.thumbnail((300, 300))
+
+        thumb_io = BytesIO()
+        img.save(thumb_io, 'JPEG', quality=85, optimize=True)
+        thumb_io.seek(0)
+
+        original_name = os.path.splitext(image_field.name)[0]
+        thumbnail_filename = f"{original_name}_thumb.jpg"
+
+        thumbnail_field.save(
+            thumbnail_filename,
+            ContentFile(thumb_io.getvalue()),
+            save=False
+        )
+
+    def save(self, *args, **kwargs):
+        # Handle image ordering
+        if not self.pk or (
+            self.pk and
+            ProductGalleryImage.objects.get(pk=self.pk).order != self.order
+        ):
+            with transaction.atomic():
+                # If an image already exists at this order, shift other images
+                existing_images = ProductGalleryImage.objects.filter(
+                    product=self.product,
+                    order__gte=self.order
+                ).exclude(pk=self.pk).select_for_update()
+
+                # Shift the order of other images
+                for img in existing_images:
+                    img.order += 1
+                    img.save()
+
+        # Process images
+        if self.pk:
+            original = ProductGalleryImage.objects.get(pk=self.pk)
+            if original.image != self.image and self.image:
+                self.create_webp_version(self.image, self.image_webp)
+                self.create_thumbnail(self.image, self.thumbnail)
+                self.create_webp_version(self.thumbnail, self.thumbnail_webp, is_thumbnail=True)
+        else:
+            if self.image:
+                self.create_webp_version(self.image, self.image_webp)
+                self.create_thumbnail(self.image, self.thumbnail)
+                self.create_webp_version(self.thumbnail, self.thumbnail_webp, is_thumbnail=True)
+
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        old_order = self.order
+
+        # Delete image files
+        if self.image:
+            self.image.delete()
+        if self.image_webp:
+            self.image_webp.delete()
+        if self.thumbnail:
+            self.thumbnail.delete()
+        if self.thumbnail_webp:
+            self.thumbnail_webp.delete()
+
+        # Reorder remaining images
+        with transaction.atomic():
+            ProductGalleryImage.objects.filter(
+                product=self.product,
+                order__gt=old_order
+            ).update(order=models.F('order') - 1)
+
+            super().delete(*args, **kwargs)
