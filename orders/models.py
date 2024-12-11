@@ -9,7 +9,7 @@ User = get_user_model()
 def generate_order_id():
     """Generate a unique order ID"""
     # Format: CASSPEA-DDMMYY-NNNN
-    random_int = random.randint(1000, 9999)
+    random_int = random.randint(10000, 99999)
     return f'CASSPEA-{timezone.now().strftime("%d%m%y")}-{random_int}'
 
 class Order(models.Model):
