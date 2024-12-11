@@ -10,41 +10,5 @@
             "created": "2024-11-24T10:00:00.000000Z",
             "updated": "2024-11-24T10:00:00.000000Z"
         }
-    },
-    {
-        "model": "products.productcategory",
-        "pk": 2,
-        "fields": {
-            "name": "Snacks",
-            "slug": "snacks",
-            "description": "Signature Snacks",
-            "active": true,
-            "created": "2024-11-24T10:15:00.000000Z",
-            "updated": "2024-11-24T10:15:00.000000Z"
-        }
-    },
-    {
-        "model": "products.productcategory",
-        "pk": 3,
-        "fields": {
-            "name": "Signature Bars",
-            "slug": "signature-bars",
-            "description": "Signature Bars",
-            "active": true,
-            "created": "2024-11-24T10:30:00.000000Z",
-            "updated": "2024-11-24T10:30:00.000000Z"
-        }
-    },
-    {
-        "model": "products.productcategory",
-        "pk": 4,
-        "fields": {
-            "name": "Advent Calendars",
-            "slug": "advent-calendars",
-            "description": "Advent Calendars",
-            "active": true,
-            "created": "2024-11-24T10:45:00.000000Z",
-            "updated": "2024-11-24T10:45:00.000000Z"
-        }
     }
 ]

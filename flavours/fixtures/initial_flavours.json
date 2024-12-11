@@ -373,7 +373,7 @@
         "pk": 21,
         "fields": {
             "name": "Whisky and Vanilla Caramel",
-            "slug": "whisky-and-vanilla-caramel-2",
+            "slug": "whisky-and-vanilla-caramel",
             "description": "A perfect after dinner treat.",
             "mini_description": "A perfect after dinner treat.",
             "allergens": [
