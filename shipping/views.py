@@ -20,7 +20,7 @@ class ShippingOptionsViewSet(ReadOnlyModelViewSet):
             options__active=True
         ).distinct()
 
-        if cart.discounted_total >= 45:
+        if cart.discounted_total >= 50:
             for company in companies:
                 for option in company.options.filter(active=True):
                     if option.delivery_speed == 'REGULAR':
