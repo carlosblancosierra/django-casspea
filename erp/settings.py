@@ -53,8 +53,9 @@ if 'test' in sys.argv:
 ALLOWED_HOSTS = [
     'django-casspea.herokuapp.com',
     '.herokuapp.com',
-    'casspea.co.uk',
-    'www.casspea.co.uk',
+    'api2.casspea.co.uk',
+    'api.casspea.co.uk',
+    'www2.casspea.co.uk',
 ]
 
 if DEBUG:
