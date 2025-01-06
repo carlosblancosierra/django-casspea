@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env*
+*.pyc
+__pycache__
+.pytest_cache
+staticfiles
+mediafiles
+.coverage
+htmlcov
+.DS_Store

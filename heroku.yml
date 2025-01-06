@@ -1,3 +1,14 @@
+setup:
+  addons:
+    - plan: heroku-postgresql:basic
+      as: DATABASE
+  config:
+    DJANGO_SETTINGS_MODULE: erp.settings
+    DEBUG: 0
+
 build:
   docker:
     web: Dockerfile.prod
+
+run:
+  web: gunicorn erp.wsgi:application --bind 0.0.0.0:$PORT

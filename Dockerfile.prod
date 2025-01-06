@@ -1,78 +1,68 @@
 ###########
 # BUILDER #
 ###########
-
-# pull official base image
 FROM python:3.11.4-slim-buster as builder
 
-# set work directory
+# Set work directory
 WORKDIR /usr/src/app
 
-# set environment variables
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# install system dependencies
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc
 
-
-# install python dependencies
+# Copy requirements
 COPY ./requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
+# Build wheels
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 #########
 # FINAL #
 #########
-
-# pull official base image
 FROM python:3.11.4-slim-buster
 
-# create directory for the app user
-RUN mkdir -p /home/app
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    netcat && \
+    rm -rf /var/lib/apt/lists/*
 
-# create the app user
-RUN addgroup --system app && adduser --system --group app
+# Create app user
+RUN addgroup --system app && \
+    adduser --system --group app
 
-# create the appropriate directories
+# Create directories
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
+RUN mkdir -p $APP_HOME \
+    $APP_HOME/staticfiles \
+    $APP_HOME/mediafiles \
+    /vol/web/static \
+    /vol/web/media
 
-# create static and media directories
-RUN mkdir -p /vol
-RUN mkdir -p /vol/web/static
-RUN mkdir -p /vol/web/media
-
-# install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends netcat
+# Install Python dependencies
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
-RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
-# copy project and set permissions
-COPY . $APP_HOME
-RUN chown -R app:app $APP_HOME
-RUN chown -R app:app /vol
-RUN chmod -R 755 /vol
-
-# copy entrypoint.prod.sh
-COPY entrypoint.prod.sh /entrypoint.prod.sh
-RUN chmod +x /entrypoint.prod.sh
-
-# change to the app user
-USER app
-
-# Set up static and media files
-RUN mkdir -p $APP_HOME/staticfiles
-RUN mkdir -p $APP_HOME/mediafiles
+# Copy project
+COPY --chown=app:app . $APP_HOME
 
 # Set permissions
-RUN chown -R app:app $APP_HOME
-RUN chmod -R 755 $APP_HOME
+RUN chown -R app:app $APP_HOME && \
+    chown -R app:app /vol && \
+    chmod -R 755 $APP_HOME && \
+    chmod -R 755 /vol
 
-# Remove the ENTRYPOINT to make it Heroku-compatible
+# Switch to app user
+USER app
+
+WORKDIR $APP_HOME
+
+# Command to run
 CMD gunicorn erp.wsgi:application --bind 0.0.0.0:$PORT
