@@ -15,6 +15,8 @@ from pathlib import Path
 import environ
 import logging
 import structlog
+import dj_database_url
+import sys
 
 # Initialize environ
 env = environ.Env()
@@ -33,12 +35,23 @@ logger = logging.getLogger(__name__)
 
 # Environment-specific settings
 ENVIRONMENT = env('ENVIRONMENT', default='development')
+IS_HEROKU = 'DYNO' in os.environ
 
-# Security settings
-SECRET_KEY = env('SECRET_KEY', default='23i872fysadv9qf3ygv138v9y138v13yvy30')
-DEBUG = env.bool('DEBUG', default=True)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+# Update DEBUG setting
+DEBUG = env.bool('DEBUG', default=False)
+if 'test' in sys.argv:
+    DEBUG = True
 
+# Update ALLOWED_HOSTS to include Heroku domains
+ALLOWED_HOSTS = [
+    'django-casspea.herokuapp.com',
+    '.herokuapp.com',
+    'casspea.co.uk',
+    'www.casspea.co.uk',
+]
+
+if DEBUG:
+    ALLOWED_HOSTS += ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -73,8 +86,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Make sure this is second
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -108,14 +122,12 @@ WSGI_APPLICATION = 'erp.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
-    }
+    'default': dj_database_url.config(
+        default=env('DATABASE_URL', default='sqlite:///db.sqlite3'),
+        conn_max_age=600,
+        conn_health_checks=True,
+        ssl_require=not DEBUG,
+    )
 }
 
 
@@ -373,3 +385,60 @@ STAFF_EMAILS = ['info@casspea.co.uk', 'sandy.gomezc@gmail.com','carlosblancosier
 
 # Site URL for tracking
 SITE_URL = 'https://casspea.co.uk'
+
+# Use WhiteNoise for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# HTTPS settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+
+# Security settings for Heroku
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# Update storage configuration for Heroku
+if not DEBUG and USE_S3:
+    # Keep your existing S3 configuration
+    pass
+else:
+    # Local and Heroku (without S3) storage configuration
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            'OPTIONS': {
+                'location': str(MEDIA_ROOT),
+                'base_url': '/media/',
+            }
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+            'OPTIONS': {
+                'location': str(STATIC_ROOT),
+                'base_url': STATIC_URL,
+            }
+        }
+    }
+
+# Add Heroku logging configuration
+if IS_HEROKU:
+    LOGGING['handlers']['console']['formatter'] = 'json_formatter'
+    LOGGING['loggers']['django']['level'] = 'WARNING'
+    LOGGING['loggers']['django.server']['level'] = 'WARNING'
+
+# Update CORS settings for Heroku
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ]
+    CSRF_TRUSTED_ORIGINS += [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ]

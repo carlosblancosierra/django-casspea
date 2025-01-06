@@ -66,5 +66,13 @@ RUN chmod +x /entrypoint.prod.sh
 # change to the app user
 USER app
 
-ENTRYPOINT ["/entrypoint.prod.sh"]
-CMD ["gunicorn", "erp.wsgi:application", "--bind", "0.0.0.0:8000"]
+# Set up static and media files
+RUN mkdir -p $APP_HOME/staticfiles
+RUN mkdir -p $APP_HOME/mediafiles
+
+# Set permissions
+RUN chown -R app:app $APP_HOME
+RUN chmod -R 755 $APP_HOME
+
+# Remove the ENTRYPOINT to make it Heroku-compatible
+CMD gunicorn erp.wsgi:application --bind 0.0.0.0:$PORT
