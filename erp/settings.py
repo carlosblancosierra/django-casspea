@@ -19,13 +19,7 @@ import dj_database_url
 import sys
 
 # Initialize environ
-env = environ.Env(
-    # Set cast and default values
-    DEBUG=(bool, False),
-    SECRET_KEY=(str, '98sdf98sd7f98sd7f98sd7f9f7%$#%&e'),  # Only for development
-    ENVIRONMENT=(str, 'production'),
-    USE_S3=(bool, True),
-)
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,9 +39,13 @@ ENVIRONMENT = env('ENVIRONMENT', default='development')
 IS_HEROKU = 'DYNO' in os.environ
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', env('SECRET_KEY'))
+# Try to get from environment first, then from env file
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'django-insecure-asdasd786asd876asd87*&^*&^D6asdfa7w6dfa8&%Dasdf4'  # Only for development
+)
 
-# Update DEBUG setting
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 if 'test' in sys.argv:
     DEBUG = True
