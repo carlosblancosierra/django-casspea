@@ -25,6 +25,12 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 FROM python:3.11.4-slim-buster
 
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HOME=/home/app \
+    APP_HOME=/home/app/web
+
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -37,8 +43,6 @@ RUN addgroup --system app && \
     adduser --system --group app
 
 # Create directories
-ENV HOME=/home/app
-ENV APP_HOME=/home/app/web
 RUN mkdir -p $APP_HOME \
     $APP_HOME/staticfiles \
     $APP_HOME/mediafiles \
@@ -64,5 +68,9 @@ USER app
 
 WORKDIR $APP_HOME
 
+# Add this before the CMD
+ENV PORT=8000
+ENV DJANGO_SETTINGS_MODULE=erp.settings
+
 # Command to run
-CMD gunicorn erp.wsgi:application --bind 0.0.0.0:$PORT
+CMD gunicorn erp.wsgi:application --bind 0.0.0.0:$PORT --log-level=info

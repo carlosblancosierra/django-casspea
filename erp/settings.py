@@ -37,6 +37,9 @@ logger = logging.getLogger(__name__)
 ENVIRONMENT = env('ENVIRONMENT', default='development')
 IS_HEROKU = 'DYNO' in os.environ
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env('SECRET_KEY')
+
 # Update DEBUG setting
 DEBUG = env.bool('DEBUG', default=False)
 if 'test' in sys.argv:
