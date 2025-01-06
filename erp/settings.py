@@ -215,42 +215,33 @@ SPECTACULAR_SETTINGS = {
 
 # Logging configuration
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "json_formatter": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.JSONRenderer(),
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
         },
-        "plain_console": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(),
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "plain_console",
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
         },
     },
-    "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "INFO",
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
         },
-        "carts": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "checkout": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
+        'django.server': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
         },
     },
 }
@@ -442,3 +433,4 @@ if DEBUG:
         'http://localhost:3000',
         'http://127.0.0.1:3000',
     ]
+
