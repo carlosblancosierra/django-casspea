@@ -29,7 +29,9 @@ FROM python:3.11.4-slim-buster
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     HOME=/home/app \
-    APP_HOME=/home/app/web
+    APP_HOME=/home/app/web \
+    PORT=8000 \
+    DJANGO_SETTINGS_MODULE=erp.settings
 
 # Install system dependencies
 RUN apt-get update && \
@@ -68,9 +70,5 @@ USER app
 
 WORKDIR $APP_HOME
 
-# Add this before the CMD
-ENV PORT=8000
-ENV DJANGO_SETTINGS_MODULE=erp.settings
-
 # Command to run
-CMD gunicorn erp.wsgi:application --bind 0.0.0.0:$PORT --log-level=info
+CMD gunicorn erp.wsgi:application --bind 0.0.0.0:$PORT --log-level=debug

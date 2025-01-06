@@ -19,13 +19,20 @@ import dj_database_url
 import sys
 
 # Initialize environ
-env = environ.Env()
+env = environ.Env(
+    # Set cast and default values
+    DEBUG=(bool, False),
+    SECRET_KEY=(str, '98sdf98sd7f98sd7f98sd7f9f7%$#%&e'),  # Only for development
+    ENVIRONMENT=(str, 'production'),
+    USE_S3=(bool, True),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Take environment variables from .env file
-environ.Env.read_env(BASE_DIR / '.env')
+# Only read .env file if it exists and we're not on Heroku
+if os.path.exists(BASE_DIR / '.env') and 'DYNO' not in os.environ:
+    environ.Env.read_env(BASE_DIR / '.env')
 
 # Add this near the top after imports
 logger = logging.getLogger(__name__)
@@ -38,7 +45,7 @@ ENVIRONMENT = env('ENVIRONMENT', default='development')
 IS_HEROKU = 'DYNO' in os.environ
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', env('SECRET_KEY'))
 
 # Update DEBUG setting
 DEBUG = env.bool('DEBUG', default=False)
