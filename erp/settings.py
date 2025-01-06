@@ -40,10 +40,9 @@ IS_HEROKU = 'DYNO' in os.environ
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Try to get from environment first, then from env file
-SECRET_KEY = os.getenv(
-    'SECRET_KEY',
-    'django-insecure-asdasd786asd876asd87*&^*&^D6asdfa7w6dfa8&%Dasdf4'  # Only for development
-)
+SECRET_KEY = os.getenv('SECRET_KEY', 'as78fd6s%dg766782f6D6AS$7F68asf87')
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
