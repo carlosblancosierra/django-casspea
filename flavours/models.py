@@ -49,6 +49,12 @@ class Flavour(models.Model):
 
     objects = FlavourManager()
 
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
 class FlavourSelection(models.Model):
     flavour = models.ForeignKey(Flavour, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
