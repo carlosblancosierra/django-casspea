@@ -32,7 +32,7 @@ class Address(models.Model):
     full_name = models.CharField(max_length=255, null=True, blank=True)
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20, null=True, blank=True)
     street_address = models.CharField(max_length=255)
     street_address2 = models.CharField(max_length=255, blank=True)
     city = models.CharField(max_length=100)
