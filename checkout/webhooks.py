@@ -166,12 +166,17 @@ def stripe_webhook(request):
 
                             # Send email to staff
 
+                            staff_html_content = render_to_string('mails/order_paid_staff.html', {
+                                'order': order,
+                                'current_year': timezone.now().year,
+                            })
+
                             send_mail(
                                 subject='New Order Confirmation',
                                 message='A new order has been placed',
                                 from_email=settings.DEFAULT_FROM_EMAIL,
                                 recipient_list=STAFF_EMAILS,
-                                html_message=html_content,
+                                html_message=staff_html_content,
                                 fail_silently=False,
                             )
                         else:
