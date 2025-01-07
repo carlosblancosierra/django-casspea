@@ -385,7 +385,7 @@ DEFAULT_FROM_EMAIL_NAME = 'CassPea'
 CONTACT_EMAIL = 'info@casspea.co.uk'
 SERVER_EMAIL = 'errors@casspea.co.uk'
 ADMINS = [('Carlos Blanco', 'carlosblancosierra@gmail.com')]
-STAFF_EMAILS = ['info@casspea.co.uk', 'sandy.gomezc@gmail.com','carlosblancosierra@gmail.com']
+STAFF_EMAILS = ['carlosblancosierra@gmail.com']
 
 # Site URL for tracking
 SITE_URL = 'https://casspea.co.uk'

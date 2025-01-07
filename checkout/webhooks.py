@@ -9,6 +9,7 @@ from mails.models import EmailType, EmailSent
 from orders.models import Order, OrderStatusHistory
 from checkout.models import CheckoutSession
 from django.core.mail import send_mail
+from erp.settings import STAFF_EMAILS, ADMINS
 import structlog
 from django.contrib.contenttypes.models import ContentType
 
@@ -149,7 +150,7 @@ def stripe_webhook(request):
                                 subject='Your CassPea Order Confirmation',
                                 message='Thank you for your order!',
                                 from_email=settings.DEFAULT_FROM_EMAIL,
-                                recipient_list=[recipient_email],
+                                recipient_list=[recipient_email, 'info@casspea.com'],
                                 html_message=html_content,
                                 fail_silently=False,
                             )
@@ -161,6 +162,17 @@ def stripe_webhook(request):
                             logger.info("Order confirmation email sent",
                                 recipient_email=recipient_email,
                                 order_id=order.order_id
+                            )
+
+                            # Send email to staff
+
+                            send_mail(
+                                subject='New Order Confirmation',
+                                message='A new order has been placed',
+                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                recipient_list=STAFF_EMAILS,
+                                html_message=html_content,
+                                fail_silently=False,
                             )
                         else:
                             logger.warning("No recipient email found for sending order confirmation", order_id=order.order_id)
