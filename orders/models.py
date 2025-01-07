@@ -7,10 +7,22 @@ import random
 User = get_user_model()
 
 def generate_order_id():
-    """Generate a unique order ID"""
-    # Format: CASSPEA-DDMMYY-NNNN
-    random_int = random.randint(10000, 99999)
-    return f'CASSPEA-{timezone.now().strftime("%d%m%y")}-{random_int}'
+    """Generate a unique order ID
+    Format: CPYY-XXXX where:
+    - CPYY: CassPea prefix with year
+    - XXXX: Random 4-character alphanumeric string
+    Example: CP25-B4K9
+    """
+    year = timezone.now().strftime("%y")
+    prefix = f'CP{year}-'
+
+    # Generate a random 4-character string using letters and numbers
+    random_str = get_random_string(
+        length=4,
+        allowed_chars='23456789ABCDEFGHJKLMNPQRSTUVWXYZ'  # Excluding confusing chars like 0,1,I,O
+    )
+
+    return f'{prefix}{random_str}'
 
 class Order(models.Model):
     STATUS_CHOICES = [
