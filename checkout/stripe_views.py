@@ -159,7 +159,7 @@ class StripeCheckoutSessionView(APIView):
 
             # Create Stripe checkout session
             stripe_session = stripe.checkout.Session.create(
-                payment_method_types=['card', 'klarna'],
+                payment_method_types=['card'],
                 line_items=line_items,
                 customer_email=checkout_session.email,
                 currency='GBP',
