@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, permissions
 from .models import Order
 from .serializers import OrderListSerializer
+from users.authentication import CustomJWTAuthentication
 
 class OrderListView(generics.ListAPIView):
     """
@@ -10,6 +11,7 @@ class OrderListView(generics.ListAPIView):
     """
     serializer_class = OrderListSerializer
     permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [CustomJWTAuthentication]
     ordering = ['-created']
 
     def get_queryset(self):
@@ -33,6 +35,7 @@ class OrderDetailView(generics.RetrieveAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderListSerializer
     permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [CustomJWTAuthentication]
     lookup_field = 'order_id'
 
     def get_queryset(self):
