@@ -24,7 +24,7 @@ from addresses.urls import urlpatterns as addresses_urls
 from shipping.urls import urlpatterns as shipping_urls
 from leads.urls import urlpatterns as leads_urls
 from users.urls import urlpatterns as user_urls
-
+from orders.urls import urlpatterns as orders_urls
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
@@ -55,6 +55,7 @@ urlpatterns = [
     path('api/shipping/', include(shipping_urls)),
     path('api/leads/', include(leads_urls)),
     path('api/users/', include(user_urls)),
+    path('api/orders/', include(orders_urls)),
 ]
 
 if settings.DEBUG and not settings.USE_S3:
