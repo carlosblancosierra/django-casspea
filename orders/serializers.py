@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Order, OrderStatusHistory
-from products.serializers import ProductSimpleSerializer
+from products.serializers import ProductSerializer
 from addresses.models import Address
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class AddressSerializer(serializers.ModelSerializer):
         ]
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSimpleSerializer()
+    product = ProductSerializer()
     base_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     discounted_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     savings = serializers.DecimalField(max_digits=10, decimal_places=2)
