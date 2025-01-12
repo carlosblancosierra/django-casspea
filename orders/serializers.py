@@ -53,7 +53,6 @@ class CartSerializer(serializers.ModelSerializer):
     base_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     discounted_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     total_savings = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
-    is_discount_valid = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Cart
