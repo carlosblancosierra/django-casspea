@@ -3,10 +3,16 @@ from .models import Order
 from checkout.models import CheckoutSession
 from addresses.serializers import AddressSerializer
 from carts.models import CartItem
-from discounts.serializers import DiscountSerializer
-from carts.models import Cart, CartItemBoxCustomization
-from products.models import Product
-from carts.serializers import CartItemBoxFlavorSelectionSerializer
+from carts.models import Cart, CartItemBoxCustomization, CartItemBoxFlavorSelection
+
+
+class CartItemBoxFlavorSelectionSerializer(serializers.ModelSerializer):
+    flavor_name = serializers.CharField(source='flavor.name')
+
+    class Meta:
+        model = CartItemBoxFlavorSelection
+        fields = ['id', 'flavor_name', 'quantity']
+
 
 class CartItemBoxCustomizationSerializer(serializers.ModelSerializer):
     flavor_selections = CartItemBoxFlavorSelectionSerializer(many=True)
@@ -15,19 +21,8 @@ class CartItemBoxCustomizationSerializer(serializers.ModelSerializer):
         model = CartItemBoxCustomization
         fields = ['id', 'selection_type', 'allergens', 'flavor_selections']
 
-class ProductSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Product
-        fields = [
-            'id',
-            'name',
-            'base_price',
-        ]
-
-
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+    product = serializers.CharField(source='product.name', read_only=True)
     box_customization = CartItemBoxCustomizationSerializer()
     base_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     discounted_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
@@ -47,7 +42,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
-    discount = DiscountSerializer(read_only=True)
+    discount = serializers.CharField(source='discount.code', read_only=True)
     gift_message = serializers.CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
     shipping_date = serializers.DateField(required=False, allow_null=True)
     base_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
