@@ -6,8 +6,6 @@ from carts.models import CartItem
 from carts.models import Cart, CartItemBoxCustomization, CartItemBoxFlavorSelection
 from products.models import Product
 class OrderProductSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name')
-
     class Meta:
         model = Product
         fields = [
