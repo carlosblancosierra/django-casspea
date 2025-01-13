@@ -5,6 +5,8 @@ from addresses.serializers import AddressSerializer
 from carts.models import CartItem
 from carts.models import Cart, CartItemBoxCustomization, CartItemBoxFlavorSelection
 from products.models import Product
+from checkout.models import ShippingOption
+
 class OrderProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -77,15 +79,56 @@ class CartSerializer(serializers.ModelSerializer):
     def get_total(self, obj):
         return str(sum(item.quantity * item.product.base_price for item in obj.items.all()))
 
+class ShippingOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShippingOption
+        fields = ['id', 'name', 'price']
 
 class CheckoutSessionSerializer(serializers.ModelSerializer):
     shipping_address = AddressSerializer()
     billing_address = AddressSerializer()
+    shipping_option = ShippingOptionSerializer()
+
+    # Add these method fields to match the model properties
+    shipping_cost = serializers.SerializerMethodField()
+    shipping_cost_pounds = serializers.SerializerMethodField()
+    total_with_shipping = serializers.SerializerMethodField()
+    shipping_stripe_format = serializers.SerializerMethodField()
 
     cart = CartSerializer()
+
     class Meta:
         model = CheckoutSession
-        fields = '__all__'
+        fields = [
+            'id',
+            'cart',
+            'shipping_address',
+            'billing_address',
+            'email',
+            'phone',
+            'created',
+            'updated',
+            'payment_status',
+            'stripe_payment_intent',
+            'stripe_session_id',
+            'shipping_option',
+            'shipping_cost',
+            'shipping_cost_pounds',
+            'total_with_shipping',
+            'shipping_stripe_format'
+        ]
+
+    def get_shipping_cost(self, obj):
+        return obj.shipping_cost
+
+    def get_shipping_cost_pounds(self, obj):
+        return obj.shipping_cost_pounds
+
+    def get_total_with_shipping(self, obj):
+        return obj.total_with_shipping
+
+    def get_shipping_stripe_format(self, obj):
+        return obj.shipping_stripe_format
 
 class OrderListSerializer(serializers.ModelSerializer):
     checkout_session = CheckoutSessionSerializer()
