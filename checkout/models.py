@@ -80,7 +80,7 @@ class CheckoutSession(models.Model):
 
         # Free shipping logic for Regular 48
         if (self.shipping_option.delivery_speed == 'REGULAR' and
-            self.cart.base_total >= 45):
+            self.cart.base_total >= 50):
             return 0
 
         return self.shipping_option.cents

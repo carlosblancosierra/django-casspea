@@ -302,8 +302,17 @@
             <p><strong>Email:</strong> {{ order.email }}</p>
             <p><strong>Phone:</strong> {{ order.checkout_session.phone }}</p>
 
-            <p>If you have any questions or need further assistance, feel free to reply to this email or contact our support team.</p>
-            <p>Best regards,<br>The CassPea Team</p>
+            <h2>Shipping Date</h2>
+            <p><strong>Shipping Date:</strong> {{ order.checkout_session.cart.shipping_date }}</p>
+            <p><strong>Shipping Option:</strong> {{ order.checkout_session.shipping_option.name }}</p>
+            <p><strong>Shipping Cost:</strong> £{{ order.checkout_session.shipping_cost_pounds }}</p>
+
+            <h2>Gift Message</h2>
+            <p><strong>Gift Message:</strong> {{ order.checkout_session.cart.gift_message }}</p>
+
+            <h2>Discount</h2>
+            <p><strong>Discount Code:</strong> {{ order.checkout_session.cart.discount.name }}</p>
+            
         </div>
 
         <!-- Footer Section -->
