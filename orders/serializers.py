@@ -4,7 +4,21 @@ from checkout.models import CheckoutSession
 from addresses.serializers import AddressSerializer
 from carts.models import CartItem
 from carts.models import Cart, CartItemBoxCustomization, CartItemBoxFlavorSelection
+from products.models import Product
+class OrderProductSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name')
 
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'name',
+            'weight',
+            'units_per_box',
+            'main_color',
+            'secondary_color',
+            'thumbnail',
+        ]
 
 class CartItemBoxFlavorSelectionSerializer(serializers.ModelSerializer):
     flavor_name = serializers.CharField(source='flavor.name')
@@ -22,7 +36,7 @@ class CartItemBoxCustomizationSerializer(serializers.ModelSerializer):
         fields = ['id', 'selection_type', 'allergens', 'flavor_selections']
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = serializers.CharField(source='product.name', read_only=True)
+    product = OrderProductSerializer()
     box_customization = CartItemBoxCustomizationSerializer()
     base_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     discounted_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
