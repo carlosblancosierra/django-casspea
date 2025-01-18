@@ -46,6 +46,8 @@ class ShippingOption(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(30)]
     )
 
+    service_code = models.CharField(max_length=50, unique=True, default='TPS48')
+
     active = models.BooleanField(default=True)
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)

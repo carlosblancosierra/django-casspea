@@ -91,7 +91,7 @@ INSTALLED_APPS = [
     'shipping',
     'mails',
     'leads',
-
+    'royalmail',
 ]
 
 MIDDLEWARE = [
@@ -186,6 +186,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://api.casspea.co.uk',
     'https://new.casspea.co.uk',
 ]
+
 
 # Allow localhost for CORS when in development
 if DEBUG:
@@ -453,3 +454,7 @@ if DEBUG:
         'http://127.0.0.1:3000',
     ]
 
+
+# Royal Mail settings
+ROYAL_MAIL_API_KEY = env('ROYAL_MAIL_API_KEY')
+ROYAL_MAIL_BASE_URL = 'https://api.parcel.royalmail.com/api/v1/'

@@ -42,6 +42,7 @@ class Product(models.Model):
     stripe_price_id = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     weight = models.IntegerField(help_text="Weight in grams")
+    box_weight = models.IntegerField(help_text="Weight of the box in grams", default=150)
 
     active = models.BooleanField(default=True)
     sold_out = models.BooleanField(default=False)
