@@ -35,6 +35,7 @@ class RoyalMailOrderCreateView(generics.CreateAPIView):
 
     def post(self, request, order_id):
         try:
+            # Get order
             order = Order.objects.select_related(
                 'checkout_session',
                 'checkout_session__cart',
@@ -42,35 +43,85 @@ class RoyalMailOrderCreateView(generics.CreateAPIView):
                 'checkout_session__shipping_option'
             ).get(order_id=order_id)
 
+            # Log order details for debugging
+            logger.info(
+                "creating_royal_mail_order",
+                order_id=order_id,
+                shipping_option=order.checkout_session.shipping_option.name
+            )
+
+            # Create order in Royal Mail's system
             royal_mail = RoyalMailService()
             response = royal_mail.create_order(order)
 
-            created_order = response.get('createdOrders', [{}])[0]
-            tracking_number = created_order.get('trackingNumber')
+            # Log raw response for debugging
+            logger.info(
+                "royal_mail_api_response",
+                order_id=order_id,
+                response=response
+            )
 
+            # Safely extract data from response
+            tracking_number = None
+            order_identifier = None
+            label_data = None
+
+            if response and isinstance(response, dict):
+                created_orders = response.get('createdOrders', [])
+                if created_orders and len(created_orders) > 0:
+                    first_order = created_orders[0]
+                    tracking_number = first_order.get('trackingNumber')
+                    order_identifier = first_order.get('orderIdentifier')
+                    label_data = first_order.get('label')
+
+            # Update order if we got a tracking number
             if tracking_number:
                 order.tracking_number = tracking_number
                 order.status = 'processing'
                 order.save()
 
+                logger.info(
+                    "royal_mail_order_created",
+                    order_id=order_id,
+                    tracking_number=tracking_number
+                )
+            else:
+                logger.error(
+                    "royal_mail_no_tracking_number",
+                    order_id=order_id,
+                    response=response
+                )
+                return Response(
+                    {'error': 'No tracking number received from Royal Mail'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             return Response({
                 'success': True,
                 'tracking_number': tracking_number,
-                'order_identifier': created_order.get('orderIdentifier'),
-                'label': created_order.get('label')
+                'order_identifier': order_identifier,
+                'label': label_data
             }, status=status.HTTP_201_CREATED)
 
         except Order.DoesNotExist:
+            logger.error(
+                "royal_mail_order_not_found",
+                order_id=order_id
+            )
             return Response(
                 {'error': 'Order not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            logger.exception("royal_mail_order_creation_failed", error=str(e))
-            return Response(
-                {'error': 'Failed to create shipping label'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            logger.exception(
+                "royal_mail_order_creation_failed",
+                error=str(e),
+                order_id=order_id
             )
+            return Response({
+                'error': 'Failed to create shipping label',
+                'detail': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RoyalMailOrderDetailView(generics.RetrieveAPIView):
     """Get Royal Mail order details"""
