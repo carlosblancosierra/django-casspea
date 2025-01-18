@@ -457,4 +457,4 @@ if DEBUG:
 
 # Royal Mail settings
 ROYAL_MAIL_API_KEY = env('ROYAL_MAIL_API_KEY')
-ROYAL_MAIL_BASE_URL = 'https://api.parcel.royalmail.com/api/v1/'
+ROYAL_MAIL_BASE_URL = 'https://api.parcel.royalmail.com/api/v1'
