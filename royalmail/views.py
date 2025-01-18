@@ -7,7 +7,7 @@ from .services import RoyalMailService
 from orders.models import Order
 from users.authentication import CustomJWTAuthentication
 import structlog
-
+from rest_framework.authentication import SessionAuthentication
 logger = structlog.get_logger(__name__)
 
 class RoyalMailOrderView(generics.GenericAPIView):
@@ -15,7 +15,7 @@ class RoyalMailOrderView(generics.GenericAPIView):
     Handle Royal Mail shipping operations
     """
     permission_classes = [permissions.IsAdminUser]
-    authentication_classes = [CustomJWTAuthentication]
+    authentication_classes = [CustomJWTAuthentication, SessionAuthentication]
 
     def post(self, request, order_id):
         """Create shipping label for order"""
