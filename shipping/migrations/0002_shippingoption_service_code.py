@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="shippingoption",
             name="service_code",
-            field=models.CharField(default="TPS48", max_length=50, unique=True),
+            field=models.CharField(max_length=50, unique=True, null=True, blank=True),
         ),
     ]
