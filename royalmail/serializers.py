@@ -15,3 +15,9 @@ class RoyalMailOrderResponseSerializer(serializers.Serializer):
 
 class RoyalMailErrorSerializer(serializers.Serializer):
     error = serializers.CharField()
+
+class RoyalMailOrderListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['order_id', 'tracking_number', 'status']
+        read_only_fields = fields
