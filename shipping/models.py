@@ -55,3 +55,6 @@ class ShippingOption(models.Model):
 
     def __str__(self):
         return f"{self.company.name} - {self.name}"
+
+    class Meta:
+        ordering = ['price']
