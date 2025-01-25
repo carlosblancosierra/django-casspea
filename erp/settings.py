@@ -45,9 +45,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'as78fd6s%dg766782f6D6AS$7F68asf87')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG', default=False)
-if 'test' in sys.argv:
-    DEBUG = True
+DEBUG = env.bool('DEBUG', default=True)
 
 # Update ALLOWED_HOSTS to include Heroku domains
 ALLOWED_HOSTS = [
@@ -92,6 +90,7 @@ INSTALLED_APPS = [
     'mails',
     'leads',
     'royalmail',
+    'personalized',
 ]
 
 MIDDLEWARE = [
@@ -130,14 +129,26 @@ WSGI_APPLICATION = 'erp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=env('DATABASE_URL', default='sqlite:///db.sqlite3'),
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=not DEBUG,
-    )
-}
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT'),
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=env('DATABASE_URL', default='sqlite:///db.sqlite3'),
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
+    }
 
 
 # Password validation
@@ -413,6 +424,9 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+else:
+    # Disable HTTPS redirect in development
+    SECURE_SSL_REDIRECT = False
 
 # Update storage configuration for Heroku
 if not DEBUG and USE_S3:

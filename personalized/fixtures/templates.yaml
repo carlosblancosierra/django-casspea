@@ -1,0 +1,31 @@
+- model: personalized.chocolatetemplate
+  pk: 1
+  fields:
+    title: "Gradient and dots"
+    slug: "gradient-and-dots"
+
+- model: personalized.chocolatetemplate
+  pk: 2
+  fields:
+    title: "Gradient"
+    slug: "gradient"
+- model: personalized.chocolatetemplate
+  pk: 3
+  fields:
+    title: "Line"
+    slug: "line"
+- model: personalized.chocolatetemplate
+  pk: 4
+  fields:
+    title: "Half Color"
+    slug: "half-color"
+- model: personalized.chocolatetemplate
+  pk: 5
+  fields:
+    title: "Brush Stroke"
+    slug: "brush-stroke"
+- model: personalized.chocolatetemplate
+  pk: 6
+  fields:
+    title: "Dots"
+    slug: "dots"

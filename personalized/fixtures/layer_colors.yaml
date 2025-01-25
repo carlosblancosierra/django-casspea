@@ -1,0 +1,167 @@
+- model: personalized.layercolor
+  pk: 1
+  fields:
+    name: "Apple Crunch"
+    hex_code: "#F28E2B"
+    slug: "apple-crunch"
+
+- model: personalized.layercolor
+  pk: 2
+  fields:
+    name: "Aqua Lagoon"
+    hex_code: "#76B7B2"
+    slug: "aqua-lagoon"
+
+- model: personalized.layercolor
+  pk: 3
+  fields:
+    name: "Blue Pearl"
+    hex_code: "#4E79A7"
+    slug: "blue-pearl"
+
+- model: personalized.layercolor
+  pk: 4
+  fields:
+    name: "Caramelita"
+    hex_code: "#9C755F"
+    slug: "caramelita"
+
+- model: personalized.layercolor
+  pk: 5
+  fields:
+    name: "Copper King"
+    hex_code: "#D37295"
+    slug: "copper-king"
+
+- model: personalized.layercolor
+  pk: 6
+  fields:
+    name: "Deep purple shimmer"
+    hex_code: "#B07AA1"
+    slug: "deep-purple-shimmer"
+
+- model: personalized.layercolor
+  pk: 7
+  fields:
+    name: "Fool's Gold"
+    hex_code: "#E15759"
+    slug: "fool-gold"
+
+- model: personalized.layercolor
+  pk: 8
+  fields:
+    name: "Forest Green"
+    hex_code: "#59A14F"
+    slug: "forest-green"
+
+- model: personalized.layercolor
+  pk: 9
+  fields:
+    name: "Green Jade Pearl"
+    hex_code: "#86BCB6"
+    slug: "green-jade-pearl"
+
+- model: personalized.layercolor
+  pk: 10
+  fields:
+    name: "Gun Metal Grey"
+    hex_code: "#79706E"
+    slug: "gun-metal-grey"
+
+- model: personalized.layercolor
+  pk: 11
+  fields:
+    name: "Hello Yellow"
+    hex_code: "#FFCB47"
+    slug: "hello-yellow"
+
+- model: personalized.layercolor
+  pk: 12
+  fields:
+    name: "Lilac"
+    hex_code: "#D4A6C8"
+    slug: "lilac"
+
+- model: personalized.layercolor
+  pk: 13
+  fields:
+    name: "Lime shine"
+    hex_code: "#B7CF73"
+    slug: "lime-shine"
+
+- model: personalized.layercolor
+  pk: 14
+  fields:
+    name: "Maroon Machine"
+    hex_code: "#984EA3"
+    slug: "maroon-machine"
+
+- model: personalized.layercolor
+  pk: 15
+  fields:
+    name: "Midnight Blue"
+    hex_code: "#274C77"
+    slug: "midnight-blue"
+
+- model: personalized.layercolor
+  pk: 16
+  fields:
+    name: "Midnight Galaxy"
+    hex_code: "#1B3A4B"
+    slug: "midnight-galaxy"
+
+- model: personalized.layercolor
+  pk: 17
+  fields:
+    name: "Mighty Mint"
+    hex_code: "#76D7EA"
+    slug: "mighty-mint"
+
+- model: personalized.layercolor
+  pk: 18
+  fields:
+    name: "Nancys Green Pearl"
+    hex_code: "#3CB371"
+    slug: "nancys-green-pearl"
+
+- model: personalized.layercolor
+  pk: 19
+  fields:
+    name: "Oh That Blue"
+    hex_code: "#4682B4"
+    slug: "oh-that-blue"
+
+- model: personalized.layercolor
+  pk: 20
+  fields:
+    name: "Pink"
+    hex_code: "#FF69B4"
+    slug: "pink"
+
+- model: personalized.layercolor
+  pk: 21
+  fields:
+    name: "Purple Rain"
+    hex_code: "#800080"
+    slug: "purple-rain"
+
+- model: personalized.layercolor
+  pk: 22
+  fields:
+    name: "Raa Rii Red"
+    hex_code: "#E74C3C"
+    slug: "raa-rii-red"
+
+- model: personalized.layercolor
+  pk: 23
+  fields:
+    name: "Salmas Orange"
+    hex_code: "#FFA07A"
+    slug: "salmas-orange"
+
+- model: personalized.layercolor
+  pk: 24
+  fields:
+    name: "Sosase Silver"
+    hex_code: "#C0C0C0"
+    slug: "sosase-silver"

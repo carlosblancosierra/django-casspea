@@ -1,0 +1,128 @@
+# Template Layer Slots
+# Each slot represents the order and the type of layer assigned to a specific template.
+
+# Template #1: "Gradient and dots"
+- model: personalized.templatelayerslot
+  pk: 1
+  fields:
+    template: 1    # Refers to "Gradient and dots" template
+    layer_type: 1  # Base layer
+    name: ""       # No specific label for this slot
+    order: 1       # First slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 2
+  fields:
+    template: 1    # Refers to "Gradient and dots" template
+    layer_type: 4  # Gradient layer
+    name: ""       # No specific label for this slot
+    order: 2       # Second slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 3
+  fields:
+    template: 1    # Refers to "Gradient and dots" template
+    layer_type: 2  # Dots layer
+    name: ""       # No specific label for this slot
+    order: 3       # Third slot in the template
+
+# Template #2: "Gradient"
+- model: personalized.templatelayerslot
+  pk: 4
+  fields:
+    template: 2    # Refers to "Gradient" template
+    layer_type: 1  # Base layer
+    name: ""       # No specific label for this slot
+    order: 1       # First slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 5
+  fields:
+    template: 2    # Refers to "Gradient" template
+    layer_type: 4  # Gradient layer
+    name: ""       # No specific label for this slot
+    order: 2       # Second slot in the template
+
+# Template #3: "Line"
+- model: personalized.templatelayerslot
+  pk: 6
+  fields:
+    template: 3    # Refers to "Line" template
+    layer_type: 1  # Base layer
+    name: ""       # No specific label for this slot
+    order: 1       # First slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 7
+  fields:
+    template: 3    # Refers to "Line" template
+    layer_type: 3  # Line layer
+    name: ""       # No specific label for this slot
+    order: 2       # Second slot in the template
+
+# Template #4: "Half Color"
+- model: personalized.templatelayerslot
+  pk: 8
+  fields:
+    template: 4    # Refers to "Half Color" template
+    layer_type: 1  # Base layer
+    name: ""       # No specific label for this slot
+    order: 1       # First slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 9
+  fields:
+    template: 4    # Refers to "Half Color" template
+    layer_type: 6  # Top Half layer
+    name: ""       # No specific label for this slot
+    order: 2       # Second slot in the template
+
+# Template #5: "Brush Stroke"
+- model: personalized.templatelayerslot
+  pk: 10
+  fields:
+    template: 5    # Refers to "Brush Stroke" template
+    layer_type: 1  # Base layer
+    name: ""       # No specific label for this slot
+    order: 1       # First slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 11
+  fields:
+    template: 5    # Refers to "Brush Stroke" template
+    layer_type: 5  # Brush Stroke layer
+    name: ""       # No specific label for this slot
+    order: 2       # Second slot in the template
+
+# Template #6: "Dots"
+- model: personalized.templatelayerslot
+  pk: 12
+  fields:
+    template: 6    # Refers to "Dots" template
+    layer_type: 1  # Base layer
+    name: ""       # No specific label for this slot
+    order: 1       # First slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 13
+  fields:
+    template: 6    # Refers to "Dots" template
+    layer_type: 2  # Dots layer
+    name: "Dots 1" # Label for the first Dots layer slot
+    order: 2       # Second slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 14
+  fields:
+    template: 6    # Refers to "Dots" template
+    layer_type: 2  # Dots layer
+    name: "Dots 2" # Label for the second Dots layer slot
+    order: 3       # Third slot in the template
+
+- model: personalized.templatelayerslot
+  pk: 15
+  fields:
+    template: 6    # Refers to "Dots" template
+    layer_type: 2  # Dots layer
+    name: "Dots 3" # Label for the third Dots layer slot
+    order: 4       # Fourth slot in the template

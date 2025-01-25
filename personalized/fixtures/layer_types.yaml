@@ -1,0 +1,29 @@
+- model: personalized.layertype
+  pk: 1
+  fields:
+    name: "Base"
+
+- model: personalized.layertype
+  pk: 2
+  fields:
+    name: "Dots"
+
+- model: personalized.layertype
+  pk: 3
+  fields:
+    name: "Line"
+
+- model: personalized.layertype
+  pk: 4
+  fields:
+    name: "Gradient"
+
+- model: personalized.layertype
+  pk: 5
+  fields:
+    name: "Brush Stroke"
+
+- model: personalized.layertype
+  pk: 6
+  fields:
+    name: "Top Half"
