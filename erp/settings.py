@@ -49,11 +49,7 @@ DEBUG = env.bool('DEBUG', default=True)
 
 # Update ALLOWED_HOSTS to include Heroku domains
 ALLOWED_HOSTS = [
-    'django-casspea.herokuapp.com',
-    '.herokuapp.com',
-    'api2.casspea.co.uk',
     'api.casspea.co.uk',
-    'www2.casspea.co.uk',
 ]
 
 if DEBUG:
@@ -186,37 +182,69 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS settings
-CORS_ORIGIN_ALLOW_ALL = False
-
+# CORS and Security Settings
+# ------------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = [
-    'https://main.d29kjbfnh50hd9.amplifyapp.com',
     'https://casspea.co.uk',
     'https://www.casspea.co.uk',
-    'https://www2.casspea.co.uk',
-    'https://api.casspea.co.uk',
-    'https://new.casspea.co.uk',
 ]
-
-
-# Allow localhost for CORS when in development
-if DEBUG:
-    CORS_ALLOWED_ORIGINS.append('http://localhost:3000')
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
-# CSRF settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://main.d29kjbfnh50hd9.amplifyapp.com',
     'https://casspea.co.uk',
     'https://www.casspea.co.uk',
-    'https://www2.casspea.co.uk',
-    'https://api.casspea.co.uk',
-    'https://new.casspea.co.uk',
 ]
 
-if DEBUG:
-    CSRF_TRUSTED_ORIGINS.append('http://localhost:3000')
+# Cookie Settings
+# ------------------------------------------------------------------------------
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days in seconds
+SESSION_COOKIE_SECURE = True if not DEBUG else False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_SAVE_EVERY_REQUEST = True
+
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
+if not DEBUG:
+    # Production cookie settings
+    CSRF_COOKIE_DOMAIN = '.casspea.co.uk'  # Allow sharing between subdomains
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access to CSRF token if needed
+
+    SESSION_COOKIE_DOMAIN = '.casspea.co.uk'
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_HTTPONLY = True
+else:
+    # Development settings
+    CORS_ALLOWED_ORIGINS += [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ]
+    CSRF_TRUSTED_ORIGINS += [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ]
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+
+# HTTPS and Security Settings
+# ------------------------------------------------------------------------------
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+else:
+    SECURE_SSL_REDIRECT = False
 
 # Add this at the bottom of settings.py
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -383,15 +411,6 @@ STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 
-# Session Settings
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_NAME = 'casspea_sessionid'  # Custom name to avoid conflicts
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days in seconds
-SESSION_COOKIE_SECURE = True if not DEBUG else False
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_SAVE_EVERY_REQUEST = True  # Important!
-
 # Email settings
 EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
@@ -457,18 +476,5 @@ if IS_HEROKU:
     LOGGING['loggers']['django']['level'] = 'WARNING'
     LOGGING['loggers']['django.server']['level'] = 'WARNING'
 
-# Update CORS settings for Heroku
-if DEBUG:
-    CORS_ALLOWED_ORIGINS += [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-    ]
-    CSRF_TRUSTED_ORIGINS += [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-    ]
-
-
-# Royal Mail settings
 ROYAL_MAIL_API_KEY = env('ROYAL_MAIL_API_KEY')
 ROYAL_MAIL_BASE_URL = 'https://api.parcel.royalmail.com/api/v1'
